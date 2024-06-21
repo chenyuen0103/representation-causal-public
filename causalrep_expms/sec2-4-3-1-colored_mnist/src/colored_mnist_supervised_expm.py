@@ -150,7 +150,7 @@ for restart in range(flags.n_restarts):
                 while lin.weight.abs().mean() > 0.1:
                     nn.init.xavier_uniform_(lin.weight, 1.)
                     print("layer", i, lin.weight.abs().mean())
-            self._main = nn.Sequential(lin1, nn.ReLU(True), lin2, nn.ReLU(True), lin3, nn.ReLU(True), nn.BatchNorm1d(flags.num_features, affine=False))
+            self._main = nn.Sequential(lin1, nn.ReLU(), lin2, nn.ReLU(), lin3, nn.ReLU(), nn.BatchNorm1d(flags.num_features, affine=False))
             self.finallayer = nn.Linear(flags.num_features, 1)
         def forward(self, input):
             features = self._main(input)
@@ -174,7 +174,7 @@ for restart in range(flags.n_restarts):
                 while lin.weight.abs().mean() > 0.1:
                     nn.init.xavier_uniform_(lin.weight, 1.)
                     print("layer", i, lin.weight.abs().mean())
-            self._tvaez = nn.Sequential(lin4, nn.ReLU(True), lin5, nn.ReLU(True))
+            self._tvaez = nn.Sequential(lin4, nn.ReLU(), lin5, nn.ReLU())
             self.finallayer = nn.Linear(1, 1)
         def forward(self, vaez):
             features = self._tvaez(vaez)
