@@ -85,6 +85,9 @@ for restart in range(flags.n_restarts):
         # Apply the color to the image by zeroing out the other color channel
         images = torch.stack([images, images], dim=1)
         images[torch.tensor(range(len(images))), (1-colors).long(), :, :] *= 0
+        # replace inplace operation with the following
+        # images[torch.tensor(range(len(images))), (1-colors).long(), :, :] = 0
+
         images = images.view(-1, flags.input_dim)
         return {
             'images': (images.float() / 255.).cuda(),
@@ -115,10 +118,13 @@ for restart in range(flags.n_restarts):
                 while lin.weight.abs().mean() > 0.1:
                     nn.init.xavier_uniform_(lin.weight, 1.)
                     print("layer", i, lin.weight.abs().mean())
-            self._main = nn.Sequential(lin1, nn.ReLU(True), lin2, nn.ReLU(True), lin3, nn.ReLU(True), nn.BatchNorm1d(flags.num_features, affine=False))
+            # self._main = nn.Sequential(lin1, nn.ReLU(True), lin2, nn.ReLU(True), lin3, nn.ReLU(True), nn.BatchNorm1d(flags.num_features, affine=False))
+            self._main = nn.Sequential(lin1, nn.ReLU(), lin2, nn.ReLU(), lin3, nn.ReLU(),
+                                       nn.BatchNorm1d(flags.num_features, affine=False))
             # _tvaez maps the VAE latent to one-dimensional outcome
             # for classification
-            self._tvaez = nn.Sequential(lin4, nn.ReLU(True), lin5, nn.ReLU(True))
+            # self._tvaez = nn.Sequential(lin4, nn.ReLU(True), lin5, nn.ReLU(True))
+            self._tvaez = nn.Sequential(lin4, nn.ReLU(), lin5, nn.ReLU())
             # self.betas = torch.zeros([self.num_features+1, 1]).cuda()
             self.finallayer = nn.Linear(flags.num_features + 1, 1)
         def forward(self, input, vaez):
@@ -331,7 +337,8 @@ for restart in range(flags.n_restarts):
 
             weight_norm = torch.tensor(0.).cuda()
             for w in mlp.parameters():
-                weight_norm += w.norm().pow(2)
+                # weight_norm += w.norm().pow(2)
+                weight_norm = weight_norm + w.norm().pow(2)
 
             env['l2penalty'] = flags.l2_reg * weight_norm
 

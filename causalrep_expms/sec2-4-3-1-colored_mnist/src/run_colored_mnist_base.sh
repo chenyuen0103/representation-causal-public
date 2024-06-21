@@ -11,7 +11,7 @@
 # Source the correct conda.sh
 source /home/yuen_chen/anaconda3/etc/profile.d/conda.sh
 
-conda activate pytorch
+conda activate gender
 
 echo "python ${FILENAME} --spurious_corr ${SPURIOUSCORR} --hidden_dim ${HDIM} --l2_reg ${L2REG} --lr ${LR} --mode ${MODE} --z_dim ${ZDIM} --num_features ${NUMFEA} "
 
