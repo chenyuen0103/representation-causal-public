@@ -86,7 +86,19 @@ for restart in range(flags.n_restarts):
         colors = torch_xor(labels, torch_bernoulli(e, len(labels)))
         # Apply the color to the image by zeroing out the other color channel
         images = torch.stack([images, images], dim=1)
-        images[torch.tensor(range(len(images))), (1-colors).long(), :, :] *= 0
+        # images[torch.tensor(range(len(images))), (1-colors).long(), :, :] *= 0
+        indices = torch.tensor(range(len(images)))
+        colors_indices = (1 - colors).long()
+
+        # Create a copy of the images tensor
+        new_images = images.clone()
+
+        # Set the values to 0 out-of-place
+        new_images[indices, colors_indices, :, :] = 0
+
+        # Assign the modified tensor back to images
+        images = new_images
+
         # replace inplace operation with the following
         # images[torch.tensor(range(len(images))), (1-colors).long(), :, :] = 0
 
