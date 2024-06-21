@@ -12,6 +12,8 @@ from torchvision import datasets, transforms
 from torch import nn, optim, autograd
 from torch.autograd import Variable
 from torchvision.utils import save_image
+torch.autograd.set_detect_anomaly(True)
+
 
 from sklearn.linear_model import LogisticRegression, Ridge
 from utils import cov, compute_prob, mean_nll, mean_accuracy, mean_accuracy_np
