@@ -61,7 +61,8 @@ def train_vae(vae, train_loader, optimizer_vae, epoch):
         loss = vae_loss_function(recon_batch, data, mu, log_var)
         
         loss.backward()
-        train_loss += loss.item()
+        # train_loss += loss.item()
+        train_loss = train_loss + loss.item()
         optimizer_vae.step()
         
         if batch_idx % 100 == 0:
@@ -78,6 +79,8 @@ def test_vae(vae, test_loader):
                 
                 # sum up batch loss
                 test_loss += vae_loss_function(recon, data, mu, log_var).item()
+                test_loss = test_loss + vae_loss_function(recon, data, mu, log_var).item()
         
-    test_loss /= len(test_loader.dataset)
+    # test_loss /= len(test_loader.dataset)
+    total_loss = test_loss / len(test_loader.dataset)
     print('====> Test set loss: {:.4f}'.format(test_loss))
