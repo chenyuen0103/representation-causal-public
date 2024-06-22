@@ -401,9 +401,10 @@ for restart in range(flags.n_restarts):
 
         test_acc = envs[1]['acc']
         if step % flags.alter_freq == 0:
-            train_causalrep_loss = -train_causalrep.clone() - 1e-1* torch.log(1 - train_featureZr2)
+            train_causalrep_loss = -train_causalrep.clone() - 1e-1 * torch.log(1 - train_featureZr2)
 
             optimizer_causalrep.zero_grad()
+            breakpoint()
             train_causalrep_loss.backward()
             optimizer_causalrep.step()
 
