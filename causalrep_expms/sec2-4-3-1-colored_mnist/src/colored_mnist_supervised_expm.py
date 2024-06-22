@@ -329,8 +329,11 @@ for restart in range(flags.n_restarts):
 
             env['covs'] = cov( torch.cat([features, mlp._tvaez(env['vaez'])], dim=1))[-1][:-1]
 
-            env['causalrep'] = ((features.std(dim=0) * mlp.finallayer.weight[0][:flags.num_features])**2).sum()
-
+            # env['causalrep'] = ((features.std(dim=0) * mlp.finallayer.weight[0][:flags.num_features])**2).sum()
+            std_features = features.std(dim=0).clone()
+            weights = mlp.finallayer.weight[0][:flags.num_features].clone()
+            causalrep = (std_features * weights).pow(2).sum()
+            env['causalrep'] = causalrep.cuda()
                 # + 2 * mlp.finallayer.weight[0][flags.num_features:] * mlp.finallayer.weight[0][:flags.num_features] * env['covs']).sum()
 
             # one can learn highly correlated features in the representations too, which can be an issue.
