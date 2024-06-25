@@ -7,9 +7,9 @@
 #SBATCH --gres=gpu:1
 #SBATCH --exclude=gonzo,bobo
 
-source /proj/sml_netapp/opt/anaconda3/etc/profile.d/conda.sh
+source /home/yuen_chen/anaconda3/etc/profile.d/conda.sh
 
-conda activate pytorch
+conda activate gender
 
 echo "python ${FILENAME} --spurious_corr ${SPURIOUSCORR} --hidden_dim ${HDIM} --l2_reg ${L2REG} --lr ${LR} --pm_coef ${PMCOEF} --z_dim ${ZDIM} --neg_corr ${NEGCORR} "
 
