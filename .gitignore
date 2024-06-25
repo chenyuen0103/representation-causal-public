@@ -133,3 +133,6 @@ Icon?
 
 *out
 *.idea/
+
+*.csv
+*.pdf

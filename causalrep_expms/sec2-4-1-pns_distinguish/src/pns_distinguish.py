@@ -169,8 +169,8 @@ plt.savefig('cond_pns.pdf')
 
 
 # plot ps, pn, pns wrt correlation
-
-for y_eval, y_eval_name in zip(['y1', 'y2'], [r'$Y_1$', r'$Y_2$']): 
+res_all_pd = res_all_pd.reset_index(drop=True)
+for y_eval, y_eval_name in zip(['y1', 'y2'], [r'$Y_1$', r'$Y_2$']):
     for z_eval, z_eval_name in zip(['z1', 'z2', 'z1*z2'], [r'$Z_1$', r'$Z_2$', r'$Z_1 & Z_2$']):
         fig, axs = plt.subplots(1,3, figsize=(12, 3))
         name = y_eval + '_' + z_eval + '_'
@@ -179,5 +179,25 @@ for y_eval, y_eval_name in zip(['y1', 'y2'], [r'$Y_1$', r'$Y_2$']):
             sns.scatterplot(ax=axs[i], x='z1_z2_corr', y=name + idx, data=res_all_pd, alpha=0.5, color='brown')
             axs[i].set_xlabel(r'Corr($Z_1, Z_2$)')
             axs[i].set_ylabel(idx.upper()+'('+z_eval_name+','+y_eval_name+')')
-        plt.tight_layout()  
-        plt.savefig(name[:-1]+'.pdf')  
+            axs[i].set_title(f'{idx.upper()} for {y_eval_name} vs {z_eval_name} wrt Corr($Z_1, Z_2$)')
+        plt.tight_layout()
+        plt.show()
+        plt.savefig(name[:-1]+'.pdf')
+
+# Ensure the DataFrame's index is unique
+# res_all_pd = res_all_pd.reset_index(drop=True)
+
+# for y_eval, y_eval_name in zip(['y1', 'y2'], [r'$Y_1$', r'$Y_2$']):
+#     for z_eval, z_eval_name in zip(['z1', 'z2', 'z1*z2'], [r'$Z_1$', r'$Z_2$', r'$Z_1 & Z_2$']):
+#         fig, axs = plt.subplots(1, 3, figsize=(12, 3))
+#         name = y_eval + '_' + z_eval + '_'
+#         cond_col = [col for col in res_all_pd if col.startswith(name)]
+#         for i, idx in enumerate(['pn', 'ps', 'pns']):
+#             sns.scatterplot(ax=axs[i], x='z1_z2_corr', y=name + idx, data=res_all_pd, alpha=0.5, color='brown')
+#             axs[i].set_xlabel(r'Corr($Z_1, Z_2$)')
+#             axs[i].set_ylabel(idx.upper() + '(' + z_eval_name + ',' + y_eval_name + ')')
+#             axs[i].set_title(f'{idx.upper()} for {y_eval_name} vs {z_eval_name} wrt Corr($Z_1, Z_2$)')
+#         plt.tight_layout()
+#         plt.show()
+#         plt.savefig(name[:-1] + '.pdf')
+
