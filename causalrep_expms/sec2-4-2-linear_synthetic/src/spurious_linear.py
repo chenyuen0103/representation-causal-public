@@ -319,6 +319,7 @@ for step in range(flags.steps):
     train_causalreploss = torch.stack([envs[0]['causalreploss']])
 
     if step % 1 == 0:
+        breakpoint()
         l2_penalty = F.softmax(mlp._main[0].weight,dim=1).abs().sum()
         # l2_penalty = (F.softmax(mlp._main[0].weight,dim=1)**2).sum()
 
