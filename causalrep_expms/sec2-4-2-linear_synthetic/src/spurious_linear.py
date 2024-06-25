@@ -22,9 +22,7 @@ from torch.autograd import Variable
 
 from utils import cov
 
-out_dir = 'out'
-if not os.path.exists(out_dir):
-    os.makedirs(out_dir)
+
 
 randseed = int(time.time()*1e7%1e8)
 print("random seed: ", randseed)
@@ -54,6 +52,13 @@ flags, unk = parser.parse_known_args()
 
 flags.input_dim = flags.D
 z_dim = flags.z_dim
+
+
+out_dir = f'out_l1_{flags.l2_reg}'
+if not os.path.exists(out_dir):
+    os.makedirs(out_dir)
+
+
 
 res = pd.DataFrame(vars(flags), index=[0])
 res['randseed'] = randseed
@@ -319,9 +324,9 @@ for step in range(flags.steps):
     train_causalreploss = torch.stack([envs[0]['causalreploss']])
 
     if step % 1 == 0:
-        breakpoint()
-        l2_penalty = F.softmax(mlp._main[0].weight,dim=1).abs().sum()
-        # l2_penalty = (F.softmax(mlp._main[0].weight,dim=1)**2).sum()
+        # breakpoint()
+        # l2_penalty = F.softmax(mlp._main[0].weight,dim=1).abs().sum()
+        l2_penalty = (F.softmax(mlp._main[0].weight,dim=1)**2).sum()
 
         train_causalrep_loss = -train_causalreploss.clone() + 1e-1 * l2_penalty
 
@@ -389,5 +394,5 @@ for item in ['causalrep_trainaccs', 'causalrep_testobsaccs', 'causalrep_testctac
 
 res = pd.concat([pd.DataFrame(causalrep_res, index=[0]), res], axis=1)
 
-res.to_csv(out_dir + '/spurious_linear_l1' + str(int(time.time()*1e6)) + '.csv')
+res.to_csv(out_dir + '/spurious_linear_l2_' + str(int(time.time()*1e6)) + '.csv')
 
