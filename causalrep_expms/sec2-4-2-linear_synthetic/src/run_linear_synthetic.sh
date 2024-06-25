@@ -92,7 +92,7 @@ for i in {1..100}; do
                                     export OUTNAME=${PYCODE_SWEEPi}_corr${SPURIOUSCORRi}_HDIM${HDIMi}_PMCOEF${PMCOEFi}_lr${LRi}_L2REG${L2REGi}_ZDIM${ZDIMi}_NEGCORR${NEGCORRi}_${TIMESTAMP}${OUT_SUFFIX}
                                     export PRTOUT=${PYCODE_SWEEPi}_corr${SPURIOUSCORRi}_HDIM${HDIMi}_PMCOEF${PMCOEFi}_lr${LRi}_L2REG${L2REGi}_ZDIM${ZDIMi}_NEGCORR${NEGCORRi}_${TIMESTAMP}${PRT_SUFFIX}
                                     echo ${NAME}
-                                    bash ${RUN_SCRIPT} > ${OUTNAME} 2>&1
+                                    bash ${RUN_SCRIPT} 2>&1 | tee ${OUTNAME}
                                 done
                             done
                         done
