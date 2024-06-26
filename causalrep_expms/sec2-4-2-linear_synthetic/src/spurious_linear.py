@@ -54,7 +54,7 @@ flags.input_dim = flags.D
 z_dim = flags.z_dim
 
 
-out_dir = f'out_l1_{flags.l2_reg}'
+out_dir = f'out_l2_{flags.l2_reg}'
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
 
