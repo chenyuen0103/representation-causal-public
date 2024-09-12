@@ -17,7 +17,7 @@ from tqdm import tqdm
 pd.set_option('display.max_columns', None)  
 pd.set_option('display.max_rows', 1000)
 pd.set_option('display.expand_frame_repr', False)
-pd.set_option('max_colwidth', -1) # change None to -1
+pd.set_option('max_colwidth', None) # change None to -1
 
 
 from collections import Counter, defaultdict
@@ -62,26 +62,42 @@ args, unk = parser.parse_known_args()
 
 # load data
 
-data_path0 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step0_data/"
+# data_path0 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step0_data/"
+#
+# data_path2 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step2_data/"
+#
+# data_path3 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step3_data/"
 
-data_path2 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step2_data/"
+data_path4 = "../data/toxic_comments.pickle"
 
-data_path3 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step3_data/"
+data_path5 = "../data/toxic_tweets.pickle"
 
 data_out = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/out/"
 
 
-df_kindle = get_kindle(data_path0)
-print("kindle dataset", df_kindle.shape, Counter(df_kindle.label))
-# display(df_kindle.head())
+# df_kindle = get_kindle(data_path0)
+# print("kindle dataset", df_kindle.shape, Counter(df_kindle.label))
+# # display(df_kindle.head())
+#
+# df_imdb = get_IMDB(data_path0)
+# print("imdb dataset", df_imdb.shape, Counter(df_imdb.label))
+# # display(df_imdb.head())
+#
+# df_large_imdb = get_large_IMDB_sentences(data_path0)
+# print("large imdb dataset", df_large_imdb.shape, Counter(df_large_imdb.label))
+# # display(df_large_imdb.head())
 
-df_imdb = get_IMDB(data_path0)
-print("imdb dataset", df_imdb.shape, Counter(df_imdb.label))
-# display(df_imdb.head())
 
-df_large_imdb = get_large_IMDB_sentences(data_path0)
-print("large imdb dataset", df_large_imdb.shape, Counter(df_large_imdb.label))
-# display(df_large_imdb.head())
+df_toxic_cmts = get_toxic_comment(data_path4)
+print("toxic comments dataset", df_toxic_cmts.shape, Counter(df_toxic_cmts.label))
+# display(df_toxic_cmts.head())
+
+
+df_toxix_tweets = get_toxic_tw(data_path5)
+print("toxic tweets dataset", df_toxix_tweets.shape, Counter(df_toxix_tweets.label))
+# display(df_toxix_tweets.head())
+
+
 
 # start processing
 

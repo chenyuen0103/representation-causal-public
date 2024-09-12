@@ -16,7 +16,7 @@ from tqdm import tqdm
 pd.set_option('display.max_columns', None)  
 pd.set_option('display.max_rows', 1000)
 pd.set_option('display.expand_frame_repr', False)
-pd.set_option('max_colwidth', -1) # change None to -1
+pd.set_option('max_colwidth', None) # change None to -1
 
 
 from collections import Counter, defaultdict
@@ -41,6 +41,35 @@ warnings.filterwarnings("ignore")
 
 
 from data_structure import Dataset #, get_IMDB, get_kindle
+
+
+def get_toxic_comment(data_path):
+    # df = pickle.load(open("/data/zwang/2020_S/Toxic/Concat_last4_emb/V_6_shortSents/toxic_short_sents.pickle",'rb'))
+    if data_path == '':
+        df = pickle.load(open("../data/toxic_comments.pickle", 'rb'))
+    else:
+        # df = pickle.load(open(data_path, 'rb'))
+        df = pd.read_pickle(data_path)
+    #     df = df.sample(frac=1)
+    df.reset_index(drop=True, inplace=True)
+
+    return df
+
+
+def get_toxic_tw(data_path):
+    """
+    Toxic tweets from paper: Characterizing Variation in Toxic Language by Social Context
+    """
+    random.seed(42)
+    # df = pd.read_csv(open("/data/zwang/2020_S/Toxic/Data/TW/toxic_tweets.csv"))
+    if data_path == '':
+        df = pd.read_csv(open("../data/toxic_tweets.csv"))
+    else:
+        df = pd.read_csv(open(data_path))
+    df['label'] = df['hostile'].apply(lambda x: 1 if x == 1 else -1)
+
+    return df[['id', 'text', 'label']]
+
 
 def get_kindle(data_path):
     """

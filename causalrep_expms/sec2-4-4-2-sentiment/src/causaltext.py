@@ -531,7 +531,7 @@ for step in range(flags.steps):
     if step % 10 == 0:
         print("itr", np.int32(step),
         "train_causalrep", train_causalrep.detach().cpu().numpy(), 
-=        "train_nll", train_nll.detach().cpu().numpy(),
+        "train_nll", train_nll.detach().cpu().numpy(),
         "train_acc", train_acc.detach().cpu().numpy(),
         "testct_acc", testct_acc.detach().cpu().numpy(),
         "testobs_acc", testobs_acc.detach().cpu().numpy())

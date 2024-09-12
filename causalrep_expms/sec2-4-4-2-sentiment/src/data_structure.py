@@ -3,6 +3,7 @@ from io import BytesIO
 import pandas as pd
 import pickle
 import numpy as np
+import random
 
 class Dataset:
     def __init__(self, X, y, vec, df, moniker):
@@ -70,11 +71,12 @@ def get_kindle():
 
 
 def get_toxic_comment():
-    df = pickle.load(open("/data/zwang/2020_S/Toxic/Concat_last4_emb/V_6_shortSents/toxic_short_sents.pickle",'rb'))
+    # df = pickle.load(open("/data/zwang/2020_S/Toxic/Concat_last4_emb/V_6_shortSents/toxic_short_sents.pickle",'rb'))
+    df = pickle.load(open("../data/toxic_comments.pickle",'rb'))
 #     df = df.sample(frac=1)
     df.reset_index(drop=True,inplace=True)
     
-    return toxic_df
+    return df
 
 
 def get_toxic_tw():
@@ -82,7 +84,8 @@ def get_toxic_tw():
     Toxic tweets from paper: Characterizing Variation in Toxic Language by Social Context
     """
     random.seed(42)
-    df = pd.read_csv(open("/data/zwang/2020_S/Toxic/Data/TW/toxic_tweets.csv"))
+    # df = pd.read_csv(open("/data/zwang/2020_S/Toxic/Data/TW/toxic_tweets.csv"))
+    df = pd.read_csv(open("../data/toxic_tweets.csv"))
     df['label'] = df['hostile'].apply(lambda x: 1 if x==1 else -1)
     
     return df[['id','text','label']]
