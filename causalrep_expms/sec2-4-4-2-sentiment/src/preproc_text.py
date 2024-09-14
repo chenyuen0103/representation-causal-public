@@ -12,6 +12,7 @@ import random
 import re
 import requests
 from scipy.sparse import hstack, lil_matrix
+import os
 
 
 from tqdm import tqdm
@@ -74,6 +75,9 @@ data_path4 = "../data/toxic_comments.pickle"
 data_path5 = "../data/toxic_tweets.csv"
 
 data_out = "../out/"
+
+if not os.path.exists(data_out):
+    os.makedirs(data_out)
 
 
 # df_kindle = get_kindle(data_path0)
