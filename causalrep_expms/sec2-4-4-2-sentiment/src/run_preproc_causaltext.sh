@@ -4,7 +4,8 @@
 TIMESTAMP=$(date +%Y%m%d%H%M%S%N)
 
 PYCODE_SWEEP="preproc_text"
-DATASET_SWEEP="imdb imdb_sents kindle"
+#DATASET_SWEEP="imdb imdb_sents kindle"
+DATASET_SWEEP="toxic_comments"
 AGGRESSIVE_SWEEP="0"
 TASKID_SWEEP="3"
 LR_SWEEP="5e-2"
@@ -35,7 +36,7 @@ for OPTIMi in ${OPTIM_SWEEP}; do
                             export OUTNAME=${PYCODE_SWEEPi}_data${DATASETi}_agg${AGGRESSIVEi}_taskid${TASKIDi}_lr${LRi}_l2reg${L2REGi}_optim${OPTIMi}_${TIMESTAMP}${OUT_SUFFIX}
                             export PRTOUT=${PYCODE_SWEEPi}_data${DATASETi}_agg${AGGRESSIVEi}_taskid${TASKIDi}_lr${LRi}_l2reg${L2REGi}_optim${OPTIMi}_${TIMESTAMP}${PRT_SUFFIX}
                             echo ${NAME}
-                            sbatch --job-name=${NAME} --output=${OUTNAME} ${RUN_SCRIPT}
+                            bash ${RUN_SCRIPT}
                         done
                     done
                 done

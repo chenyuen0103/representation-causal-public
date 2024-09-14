@@ -13,7 +13,7 @@ class Dataset:
         self.y = y
         self.vec = vec
         self.df = df
-        self.feats = np.array(vec.get_feature_names())
+        self.feats = np.array(vec.get_feature_names_out())
         self.moniker = moniker 
 
         

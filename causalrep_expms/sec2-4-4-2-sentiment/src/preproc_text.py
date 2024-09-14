@@ -13,6 +13,7 @@ import re
 import requests
 from scipy.sparse import hstack, lil_matrix
 
+
 from tqdm import tqdm
 pd.set_option('display.max_columns', None)  
 pd.set_option('display.max_rows', 1000)
@@ -62,17 +63,17 @@ args, unk = parser.parse_known_args()
 
 # load data
 
-# data_path0 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step0_data/"
-#
-# data_path2 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step2_data/"
-#
-# data_path3 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step3_data/"
+data_path0 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step0_data/"
+
+data_path2 = "../data/"
+
+data_path3 = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/data/Step3_data/"
 
 data_path4 = "../data/toxic_comments.pickle"
 
-data_path5 = "../data/toxic_tweets.pickle"
+data_path5 = "../data/toxic_tweets.csv"
 
-data_out = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/out/"
+data_out = "../out/"
 
 
 # df_kindle = get_kindle(data_path0)
@@ -90,21 +91,23 @@ data_out = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aa
 
 df_toxic_cmts = get_toxic_comment(data_path4)
 print("toxic comments dataset", df_toxic_cmts.shape, Counter(df_toxic_cmts.label))
+df_toxic_cmts_train, df_toxic_cmts_test = train_test_split(df_toxic_cmts, test_size=0.2, random_state=42)
 # display(df_toxic_cmts.head())
 
 
-df_toxix_tweets = get_toxic_tw(data_path5)
-print("toxic tweets dataset", df_toxix_tweets.shape, Counter(df_toxix_tweets.label))
+df_toxic_tweets = get_toxic_tw(data_path5)
+print("toxic tweets dataset", df_toxic_tweets.shape, Counter(df_toxic_tweets.label))
+df_toxic_tweets_train, df_toxic_tweets_test = train_test_split(df_toxic_tweets, test_size=0.2, random_state=42)
+
 # display(df_toxix_tweets.head())
 
 
 
 # start processing
-
 datasets = []
-get_data_df, moniker, coef_thresh, placebo_thresh = get_IMDB, 'imdb', 1.0, 0.1
+get_data_df, moniker, coef_thresh, placebo_thresh = get_toxic_comment, 'toxic_comments', 1.0, 0.1
 
-df = get_data_df(data_path0)
+df = get_data_df(data_path4)
 X, y, vec, feats = simple_vectorize(df) # vectorize text
 ds = Dataset(X, y, vec, df, moniker) # construct dataset object
 
@@ -163,33 +166,49 @@ print('Feature matrix: %s' % str(X.shape))
 df_kindle = pickle.load(open(data_path2+"kindle_data.pkl",'rb'))
 df_test = df_kindle[df_kindle['flag']=='test']
 
+
 df_test_select = select_sents(df_test, data_path2)
-# display(df_test_select.head())
+print(df_test_select.head())
 
-ds_imdb = run_experiment(moniker='imdb',coef_thresh=0.4,data_path=data_path2, data_out=data_out)
-ds_imdb_sents = run_experiment(moniker='imdb_sents',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
+# ds_imdb = run_experiment(moniker='imdb',coef_thresh=0.4,data_path=data_path2, data_out=data_out)
+# ds_imdb_sents = run_experiment(moniker='imdb_sents',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
+# #
+# ds_kindle = run_experiment(moniker='kindle',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
 
-ds_kindle = run_experiment(moniker='kindle',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
 
+ds_toxic_cmts = run_experiment(moniker='toxic_comments',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
+ds_toxic_tweets = run_experiment(moniker='toxic_tweets',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
 
 
 moniker = args.dataset
-ds = load_data(moniker, data_out)
+moniker = 'toxic_comments'
+ds = load_data(moniker, data_path2)
 dir(ds)
-train_data, test_data = organize_data(ds,limit='')
+
+if 'toxic' in moniker:
+    train_data, test_data = train_test_split(ds, test_size=0.2, random_state=42)
+else:
+    train_data, test_data = organize_data(ds,limit='')
 df_result = classification_performance(train_data, test_data)
 df_result
 
-train_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(train_data['original']))
-embed_all_sentences(train_data['all_original_sentences'])
+
+if 'toxic' not in moniker:
+    train_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(train_data['original']))
+    embed_all_sentences(train_data['all_original_sentences'])
+else:
+    embed_all_sentences(get_all_sentences(pd.DataFrame(train_data[['text','label']])))
 
 pickle.dump(train_data, open(data_out + 'ds_' + moniker + 'train' + '_w_emb.pkl','wb'))
 
-test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data['Original']))
-embed_all_sentences(test_data['all_original_sentences'])
+if 'toxic' not in moniker:
+    test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data['original']))
+    embed_all_sentences(test_data['all_original_sentences'])
+else:
+    embed_all_sentences(get_all_sentences(pd.DataFrame(test_data['text'])))
 
-test_data['all_counterfactual_sentences'] = get_all_sentences(pd.DataFrame(test_data['Counterfactual']))
-embed_all_sentences(test_data['all_counterfactual_sentences'])
+    test_data['all_counterfactual_sentences'] = get_all_sentences(pd.DataFrame(test_data['Counterfactual']))
+    embed_all_sentences(test_data['all_counterfactual_sentences'])
 
 pickle.dump(test_data, open(data_out + 'ds_' + moniker + 'test' + '_w_emb.pkl','wb'))
 

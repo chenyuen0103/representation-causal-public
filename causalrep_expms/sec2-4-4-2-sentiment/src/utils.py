@@ -44,11 +44,11 @@ from data_structure import Dataset #, get_IMDB, get_kindle
 
 
 def get_toxic_comment(data_path):
-    # df = pickle.load(open("/data/zwang/2020_S/Toxic/Concat_last4_emb/V_6_shortSents/toxic_short_sents.pickle",'rb'))
+    # df = pd.read_pickle("/data/zwang/2020_S/Toxic/Concat_last4_emb/V_6_shortSents/toxic_short_sents.pickle",'rb')
     if data_path == '':
-        df = pickle.load(open("../data/toxic_comments.pickle", 'rb'))
+        df = pd.read_pickle("../data/toxic_comments.pickle", 'rb')
     else:
-        # df = pickle.load(open(data_path, 'rb'))
+        # df = pd.read_pickle(data_path, 'rb')
         df = pd.read_pickle(data_path)
     #     df = df.sample(frac=1)
     df.reset_index(drop=True, inplace=True)
@@ -65,7 +65,7 @@ def get_toxic_tw(data_path):
     if data_path == '':
         df = pd.read_csv(open("../data/toxic_tweets.csv"))
     else:
-        df = pd.read_csv(open(data_path))
+        df = pd.read_csv(data_path)
     df['label'] = df['hostile'].apply(lambda x: 1 if x == 1 else -1)
 
     return df[['id', 'text', 'label']]
@@ -75,7 +75,7 @@ def get_kindle(data_path):
     """
     Only use selected_train data
     """
-    df_kindle = pickle.load(open(data_path+'kindle_data.pkl','rb'))
+    df_kindle = pd.read_pickle(data_path+'kindle_data.pkl','rb')
     df_kindle = df_kindle[df_kindle['flag']=='selected_train']
     df_kindle.reset_index(drop=True,inplace=True)
     return df_kindle
@@ -94,12 +94,12 @@ def get_IMDB(data_path):
     """
     IMDB data split into sentences (len>1 and len<30)
     """
-#     df_imdb = pickle.load(open(data_path+'imdb/imdb_sentences/imdb_sents.pkl','rb'))
+#     df_imdb = pd.read_pickle(data_path+'imdb/imdb_sentences/imdb_sents.pkl','rb')
 
 
-    # ds_imdb_ct = pickle.load(open("/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main_full_data/Step1_data/ds_imdb.pkl", "rb")) # it is the same dataset as below
+    # ds_imdb_ct = pd.read_pickle("/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main_full_data/Step1_data/ds_imdb.pkl")) # it is the same dataset as below
 
-    ds_imdb_ct = pickle.load(open(data_path+"ds_imdb_sents.pkl", "rb"))
+    ds_imdb_ct = pd.read_pickle(data_path+"ds_imdb_sents.pkl")
     df_imdb = ds_imdb_ct.train[['batch_id','text','label']]
     df_imdb.reset_index(drop=True,inplace=True)
     
@@ -109,7 +109,7 @@ def get_large_IMDB_sentences(data_path):
     """
     IMDB sentences from the original large dataset
     """
-    df_imdb = pickle.load(open(data_path+'large_imdb_sents.pkl','rb'))
+    df_imdb = pd.read_pickle(data_path+'large_imdb_sents.pkl','rb')
     return df_imdb
 
 
@@ -122,7 +122,7 @@ def simple_vectorize(df):
     X = vec.fit_transform(df.text)
     print(X.shape)
     y = df.label.values
-    feats = np.array(vec.get_feature_names())
+    feats = np.array(vec.get_feature_names_out())
     
     return X, y, vec, feats
 
@@ -132,7 +132,7 @@ def get_top_terms(datasetX, datasety, coef_thresh, placebo_thresh, C=1):
     Top features: abs(coef) >= thresh
     Placebos: abs(coef) <= thresh
     """
-    clf = LogisticRegression(class_weight='auto', C=C, solver='lbfgs', max_iter=1000)
+    clf = LogisticRegression(class_weight='balanced', C=C, solver='lbfgs', max_iter=1000)
     clf.fit(datasetX, datasety)
     
 #     print_coef(clf, dataset.feats, n=100)
@@ -149,7 +149,7 @@ def get_top_terms_preproc(clf, vec, topn=0, min_coef=0.5, show_data=False):
     - fit classifier
     - Select features by: topn or min_coef
     """
-    df_vocab = pd.DataFrame({'term':vec.get_feature_names(),'coef':[float("%.3f" % c) for c in clf.coef_[0]]})
+    df_vocab = pd.DataFrame({'term':vec.get_feature_names_out(),'coef':[float("%.3f" % c) for c in clf.coef_[0]]})
     
     if(topn == 0 and min_coef == 0):
         return df_vocab
@@ -240,11 +240,15 @@ def embed_all_sentences(sentences, bert_tokenizer=None, sentence_model=None):
 
 def load_data(moniker, data_path):
     if(moniker == 'kindle'):
-        ds = pickle.load(open(data_path+"ds_kindle.pkl", "rb"))
+        ds = pd.read_pickle(data_path+"ds_kindle.pkl")
     elif(moniker == 'imdb'):
-        ds = pickle.load(open(data_path+"ds_imdb.pkl", "rb"))
+        ds = pd.read_pickle(data_path+"ds_imdb.pkl")
     elif(moniker == 'imdb_sents'):
-        ds = pickle.load(open(data_path+"ds_imdb_sents.pkl", "rb"))
+        ds = pd.read_pickle(data_path+"ds_imdb_sents.pkl")
+    elif(moniker == 'toxic_comments'):
+        ds = pd.read_pickle(data_path+"toxic_comments.pickle")
+    elif(moniker == 'toxic_tweets'):
+        ds = pd.read_csv(data_path+"toxic_tweets.csv")
     return ds
 
 def organize_data(ds, limit=''):
@@ -311,7 +315,7 @@ def fit_classifier(train_text, train_label, test_text, test_label, report=True, 
         X_train = vec.fit_transform(list(train_text))
         X_test = vec.transform(test_text)
     
-    clf = LogisticRegression(class_weight='auto', solver='lbfgs', max_iter=1000)
+    clf = LogisticRegression(class_weight='balanced', solver='lbfgs', max_iter=1000)
     clf.fit(X_train, train_label)
     
     
@@ -410,7 +414,7 @@ def get_data(moniker, data_path):
     - get kindle or imdb from different files
     """
     if(moniker == 'kindle'):
-        df_kindle = pickle.load(open(data_path+"kindle_data.pkl",'rb'))
+        df_kindle = pd.read_pickle(data_path+"kindle_data.pkl")
         df_train = df_kindle[df_kindle['flag']=='selected_train']
         df_test = df_kindle[df_kindle['flag']=='test']
         df_antonym_vocab = pd.read_csv(data_path+'kindle_vocab_antonym_causal.csv')
@@ -421,10 +425,20 @@ def get_data(moniker, data_path):
         df_antonym_vocab = pd.read_csv(data_path+'imdb_vocab_antonym_causal.csv')
         df_identified_causal = pd.read_csv(data_path+'imdb_identified_causal.csv')
     elif(moniker == 'imdb_sents'):
-        df_train = pickle.load(open(data_path+"train_paired_sents.pkl", 'rb'))
-        df_test = pickle.load(open(data_path+"test_paired_sents.pkl", 'rb'))
+        df_train = pd.read_pickle(data_path+"train_paired_sents.pkl")
+        df_test = pd.read_pickle(data_path+"test_paired_sents.pkl")
         df_antonym_vocab = pd.read_csv(data_path+'imdb_vocab_antonym_causal.csv')
         df_identified_causal = pd.read_csv(data_path+'imdb_identified_causal.csv')
+    elif(moniker == 'toxic_comments'):
+        df= get_toxic_comment(data_path+'toxic_comments.pickle')
+        df_train, df_test = train_test_split(df, test_size=0.2, random_state=42)
+        df_antonym_vocab = None
+        df_identified_causal = None
+    elif(moniker == 'toxic_tweets'):
+        df= get_toxic_tw(data_path+'toxic_tweets.csv')
+        df_train, df_test = train_test_split(df, test_size=0.2, random_state=42)
+        df_antonym_vocab = None
+        df_identified_causal = None
         
     return df_train, df_test, df_antonym_vocab, df_identified_causal
 
@@ -473,7 +487,7 @@ def fit_classifier(train_text, train_label, test_text, test_label, report=True, 
         X_train = vec.fit_transform(list(train_text))
         X_test = vec.transform(test_text)
         
-    clf = LogisticRegression(class_weight='auto', solver='lbfgs', max_iter=1000)
+    clf = LogisticRegression(class_weight='balanced', solver='lbfgs', max_iter=1000)
     clf.fit(X_train, train_label)
     
     if(report):
@@ -488,7 +502,7 @@ def fit_classifier(train_text, train_label, test_text, test_label, report=True, 
 #     - fit classifier
 #     - Select features by: topn or min_coef
 #     """
-#     df_vocab = pd.DataFrame({'term':vec.get_feature_names(),'coef':[float("%.3f" % c) for c in clf.coef_[0]]})
+#     df_vocab = pd.DataFrame({'term':vec.get_feature_names_out(),'coef':[float("%.3f" % c) for c in clf.coef_[0]]})
     
 #     if(topn == 0 and min_coef == 0):
 #         return df_vocab
@@ -592,8 +606,8 @@ def run_experiment(moniker,coef_thresh, data_path, data_out):
         
         if(moniker == 'kindle'):
             ds.select_test = select_sents(df_test, data_path)
-    
-    ds.identified_causal_terms = df_identified_causal[df_identified_causal.identified_causal == 1]
+    if 'toxic' not in moniker:
+        ds.identified_causal_terms = df_identified_causal[df_identified_causal.identified_causal == 1]
         
     print('Train: %s' % str(Counter(df_train.label).items()))
     print('Test: %s' % str(Counter(df_test.label).items()))
@@ -604,10 +618,11 @@ def run_experiment(moniker,coef_thresh, data_path, data_out):
                               report=True, train='train')
     
     vocab = get_top_terms_preproc(clf, vec, topn=0, min_coef=0, show_data=False)
-    
-    ds.antonym_vocab = df_antonym_vocab
-    ds.all_causal_terms = ds.antonym_vocab[(ds.antonym_vocab.causal == 1) & (ds.antonym_vocab.term.isin(vocab.term.values))]
-    ds.all_causal_terms['antonyms'] = ds.all_causal_terms['antonyms'].apply(lambda x: eval(x))
+
+    if 'toxic' not in moniker:
+        ds.antonym_vocab = df_antonym_vocab
+        ds.all_causal_terms = ds.antonym_vocab[(ds.antonym_vocab.causal == 1) & (ds.antonym_vocab.term.isin(vocab.term.values))]
+        ds.all_causal_terms['antonyms'] = ds.all_causal_terms['antonyms'].apply(lambda x: eval(x))
     
     # 3. Get top words
     clf, vec = fit_classifier(train_text = df_train.text.values, train_label = df_train.label.values,
@@ -617,50 +632,51 @@ def run_experiment(moniker,coef_thresh, data_path, data_out):
     ds.top_terms = get_top_terms_preproc(clf, vec, topn=0, min_coef=coef_thresh, show_data=True)
 
     # Number of top terms not covered in the full vocab
-    missing_terms = [term for term in ds.top_terms.term if term not in ds.antonym_vocab.term.values]
-    print('\n%d top terms: %d pos, %d neg, %d missing from full vocab\n' % (ds.top_terms.shape[0], ds.top_terms[ds.top_terms.coef>0].shape[0], ds.top_terms[ds.top_terms.coef<0].shape[0], len(missing_terms)))
-    print('Missing terms:', missing_terms)
+    if 'toxic' not in moniker:
+        missing_terms = [term for term in ds.top_terms.term if term not in ds.antonym_vocab.term.values]
+        print('\n%d top terms: %d pos, %d neg, %d missing from full vocab\n' % (ds.top_terms.shape[0], ds.top_terms[ds.top_terms.coef>0].shape[0], ds.top_terms[ds.top_terms.coef<0].shape[0], len(missing_terms)))
+        print('Missing terms:', missing_terms)
 
-    # 3. Assign causal label to top words (load from pre-annotated file)
-    ds.top_terms['causal'] = [ds.antonym_vocab[ds.antonym_vocab['term'] == item.term].causal.values[0] if item.term in ds.antonym_vocab.term.values else 0 for i, item in ds.top_terms.iterrows()]
-    
-    # 4. Get antonyms for causal words    
-    ds.top_terms['antonyms'] = [eval(ds.antonym_vocab[ds.antonym_vocab['term'] == item.term].antonyms.values[0]) if item.term in ds.antonym_vocab.term.values else {} for i, item in ds.top_terms.iterrows()]
-    ds.top_terms['n_antonyms'] = ds.top_terms['antonyms'].apply(lambda x: len(x))
-    df_causal_terms = ds.top_terms[ds.top_terms['causal'] == 1]
-    df_bad_terms = ds.top_terms[ds.top_terms['causal'] == 0]
-    ds.identified_causal_terms['antonyms'] = [eval(ds.antonym_vocab[ds.antonym_vocab['term'] == item.term].antonyms.values[0]) if item.term in ds.antonym_vocab.term.values else {} for i, item in ds.identified_causal_terms.iterrows()]
+        # 3. Assign causal label to top words (load from pre-annotated file)
+        ds.top_terms['causal'] = [ds.antonym_vocab[ds.antonym_vocab['term'] == item.term].causal.values[0] if item.term in ds.antonym_vocab.term.values else 0 for i, item in ds.top_terms.iterrows()]
 
-    print('\nGet antonyms for %d out of %d causal terms' % (df_causal_terms[df_causal_terms['n_antonyms'] > 0].shape[0], ds.top_terms[ds.top_terms['causal'] == 1].shape[0]))
-    print('Closest opposite match identified causal terms: %d out of %d\n' % (ds.identified_causal_terms[ds.identified_causal_terms.causal==1].shape[0],ds.identified_causal_terms.shape[0]))
+        # 4. Get antonyms for causal words
+        ds.top_terms['antonyms'] = [eval(ds.antonym_vocab[ds.antonym_vocab['term'] == item.term].antonyms.values[0]) if item.term in ds.antonym_vocab.term.values else {} for i, item in ds.top_terms.iterrows()]
+        ds.top_terms['n_antonyms'] = ds.top_terms['antonyms'].apply(lambda x: len(x))
+        df_causal_terms = ds.top_terms[ds.top_terms['causal'] == 1]
+        df_bad_terms = ds.top_terms[ds.top_terms['causal'] == 0]
+        ds.identified_causal_terms['antonyms'] = [eval(ds.antonym_vocab[ds.antonym_vocab['term'] == item.term].antonyms.values[0]) if item.term in ds.antonym_vocab.term.values else {} for i, item in ds.identified_causal_terms.iterrows()]
 
-    # 5. Automatically generate counterfactual samples for both training and testing data
-    for flag, df_ct_terms in zip(['causal','bad','top','identified_causal','all_causal'],[df_causal_terms, df_bad_terms, ds.top_terms, ds.identified_causal_terms, ds.all_causal_terms]):
-        identify_causal_words(ds.train, df_ct_terms, flag, show_data=True)
-        generate_ct_sentences(ds.train, df_ct_terms, flag)
+        print('\nGet antonyms for %d out of %d causal terms' % (df_causal_terms[df_causal_terms['n_antonyms'] > 0].shape[0], ds.top_terms[ds.top_terms['causal'] == 1].shape[0]))
+        print('Closest opposite match identified causal terms: %d out of %d\n' % (ds.identified_causal_terms[ds.identified_causal_terms.causal==1].shape[0],ds.identified_causal_terms.shape[0]))
 
-        identify_causal_words(ds.test, df_ct_terms, flag, show_data=True)
-        generate_ct_sentences(ds.test, df_ct_terms,flag)
-    
-    
-    if(moniker == 'kindle'):
-        df_annotate_ct = pd.read_csv(data_path+'kindle_ct_edit_500.csv')
-        ds.test['ct_text_amt'] = [df_annotate_ct[df_annotate_ct['id']==idx]['ct_text_amt'].values[0] for idx in ds.test.index.values]
-        ds.select_test['ct_text_amt'] = ds.test.loc[list(ds.select_test.index.values)]['ct_text_amt'].values
-        ds.select_test['ct_label'] = ds.select_test['label'].apply(lambda x: 0-x)
-    if(moniker == 'kindle' or moniker == 'imdb_sents'):
-        ds.train['ct_label'] = ds.train['label'].apply(lambda x: 0-x)
-        ds.test['ct_label'] = ds.test['label'].apply(lambda x: 0-x)
+        # 5. Automatically generate counterfactual samples for both training and testing data
+        for flag, df_ct_terms in zip(['causal','bad','top','identified_causal','all_causal'],[df_causal_terms, df_bad_terms, ds.top_terms, ds.identified_causal_terms, ds.all_causal_terms]):
+            identify_causal_words(ds.train, df_ct_terms, flag, show_data=True)
+            generate_ct_sentences(ds.train, df_ct_terms, flag)
 
-    # display(ds.test.head(2))
+            identify_causal_words(ds.test, df_ct_terms, flag, show_data=True)
+            generate_ct_sentences(ds.test, df_ct_terms,flag)
 
 
-    if(moniker == 'kindle'):
-        pickle.dump(ds, open(data_out+"ds_kindle.pkl", "wb"))
-    elif(moniker == 'imdb'):
-        pickle.dump(ds, open(data_out+"ds_imdb.pkl", "wb"))
-    elif(moniker == 'imdb_sents'):
-        pickle.dump(ds, open(data_out+"ds_imdb_sents.pkl", "wb"))
+        if(moniker == 'kindle'):
+            df_annotate_ct = pd.read_csv(data_path+'kindle_ct_edit_500.csv')
+            ds.test['ct_text_amt'] = [df_annotate_ct[df_annotate_ct['id']==idx]['ct_text_amt'].values[0] for idx in ds.test.index.values]
+            ds.select_test['ct_text_amt'] = ds.test.loc[list(ds.select_test.index.values)]['ct_text_amt'].values
+            ds.select_test['ct_label'] = ds.select_test['label'].apply(lambda x: 0-x)
+        if(moniker == 'kindle' or moniker == 'imdb_sents'):
+            ds.train['ct_label'] = ds.train['label'].apply(lambda x: 0-x)
+            ds.test['ct_label'] = ds.test['label'].apply(lambda x: 0-x)
+
+        # display(ds.test.head(2))
+
+
+        if(moniker == 'kindle'):
+            pickle.dump(ds, open(data_out+"ds_kindle.pkl", "wb"))
+        elif(moniker == 'imdb'):
+            pickle.dump(ds, open(data_out+"ds_imdb.pkl", "wb"))
+        elif(moniker == 'imdb_sents'):
+            pickle.dump(ds, open(data_out+"ds_imdb_sents.pkl", "wb"))
 
     return ds
 

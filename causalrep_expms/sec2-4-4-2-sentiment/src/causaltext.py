@@ -24,7 +24,7 @@ from tqdm import tqdm
 pd.set_option('display.max_columns', None)  
 pd.set_option('display.max_rows', 1000)
 pd.set_option('display.expand_frame_repr', False)
-pd.set_option('max_colwidth', -1) # change None to -1
+pd.set_option('max_colwidth', None) # change None to -1
 
 import collections
 from collections import Counter, defaultdict
