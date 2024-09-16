@@ -193,8 +193,8 @@ if 'toxic' in moniker:
     train_data, test_data = train_test_split(ds, test_size=0.2, random_state=42)
 else:
     train_data, test_data = organize_data(ds,limit='')
-df_result = classification_performance(train_data, test_data)
-df_result
+# df_result = classification_performance(train_data, test_data)
+# df_result
 
 
 if 'toxic' not in moniker:
