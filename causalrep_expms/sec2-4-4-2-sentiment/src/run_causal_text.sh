@@ -4,8 +4,7 @@
 TIMESTAMP=$(date +%Y%m%d%H%M%S%N)
 
 PYCODE_SWEEP="causaltext"
-#DATASET_SWEEP="kindle imdb imdb_sents"
-DATASET_SWEEP="kindle"
+DATASET_SWEEP="kindle imdb imdb_sents"
 HDIM_SWEEP="1024"
 LR_SWEEP="1e-2 1e-1"
 L2REG_SWEEP="1e-1 1e-2 1e0"
@@ -40,7 +39,7 @@ for i in {1..3}; do
                                     export OUTNAME=${PYCODE_SWEEPi}_data${DATASETi}_HDIM${HDIMi}_MODE${MODEi}_lr${LRi}_L2REG${L2REGi}_ZDIM${ZDIMi}_NUMFEA${NUMFEAi}_${TIMESTAMP}${OUT_SUFFIX}
                                     export PRTOUT=${PYCODE_SWEEPi}_data${DATASETi}_HDIM${HDIMi}_MODE${MODEi}_lr${LRi}_L2REG${L2REGi}_ZDIM${ZDIMi}_NUMFEA${NUMFEAi}_${TIMESTAMP}${PRT_SUFFIX}
                                     echo ${NAME}
-                                    sbatch --job-name=${NAME} --output=${OUTNAME} ${RUN_SCRIPT}
+                                    bash ${RUN_SCRIPT} > ${OUTNAME} 2>&1
                                 done
                             done
                         done
