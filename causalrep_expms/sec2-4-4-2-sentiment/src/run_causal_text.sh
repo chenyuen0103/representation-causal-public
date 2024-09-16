@@ -5,7 +5,8 @@ TIMESTAMP=$(date +%Y%m%d%H%M%S%N)
 
 PYCODE_SWEEP="causaltext"
 #DATASET_SWEEP="kindle imdb imdb_sents"
-DATASET_SWEEP="kindle"
+DATASET_SWEEP="imdb imdb_sents"
+#DATASET_SWEEP="kindle"
 HDIM_SWEEP="1024"
 #LR_SWEEP="1e-2 1e-1"
 LR_SWEEP="1e-2"
