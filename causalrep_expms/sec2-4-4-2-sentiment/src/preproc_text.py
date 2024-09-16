@@ -167,12 +167,12 @@ print('Feature matrix: %s' % str(X.shape))
 
 # produce train/test datasets from step 2
 
-df_kindle = pickle.load(open(data_path2+"kindle_data.pkl",'rb'))
-df_test = df_kindle[df_kindle['flag']=='test']
-
-
-df_test_select = select_sents(df_test, data_path2)
-print(df_test_select.head())
+# df_kindle = pickle.load(open(data_path2+"kindle_data.pkl",'rb'))
+# df_test = df_kindle[df_kindle['flag']=='test']
+#
+#
+# df_test_select = select_sents(df_test, data_path2)
+# print(df_test_select.head())
 
 # ds_imdb = run_experiment(moniker='imdb',coef_thresh=0.4,data_path=data_path2, data_out=data_out)
 # ds_imdb_sents = run_experiment(moniker='imdb_sents',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
