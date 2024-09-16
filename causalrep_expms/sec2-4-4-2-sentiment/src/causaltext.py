@@ -148,14 +148,16 @@ if 'toxic' not in moniker:
 clustering = AgglomerativeClustering(metric='cosine',n_clusters=None, distance_threshold=0.05,linkage='complete').fit(list(train_embedding_np)) # for short sents, kindle 0.1; otherwise 0.05
 X_train_cl = clustering.labels_[:train_embedding_np.shape[0]]
 X_testobs_cl = clustering.labels_[:testobs_embedding_np.shape[0]] # placeholder
-X_testct_cl = clustering.labels_[:testct_embedding_np.shape[0]] #placeholder
+if 'toxic' not in moniker:
+    X_testct_cl = clustering.labels_[:testct_embedding_np.shape[0]] #placeholder
 
 
 dummy = np.eye(clustering.labels_.max()+1)
 
 X_train_cl_embedding = torch.from_numpy(dummy[X_train_cl]).float().to(device)
 X_testobs_cl_embedding = torch.from_numpy(dummy[X_testobs_cl]).float().to(device)
-X_testct_cl_embedding = torch.from_numpy(dummy[X_testct_cl]).float().to(device)
+if 'toxic' not in moniker:
+    X_testct_cl_embedding = torch.from_numpy(dummy[X_testct_cl]).float().to(device)
 
 
 
@@ -167,7 +169,8 @@ if 'toxic' not in moniker:
 
 torch.save(X_train_cl_embedding, train_bert_cl_name)
 torch.save(X_testobs_cl_embedding, testobs_bert_cl_name)
-torch.save(X_testct_cl_embedding, testct_bert_cl_name)
+if 'toxic' not in moniker:
+    torch.save(X_testct_cl_embedding, testct_bert_cl_name)
 
 
 X_train_cl_embedding = torch.load(pt_path+train_bert_cl_name).detach()
