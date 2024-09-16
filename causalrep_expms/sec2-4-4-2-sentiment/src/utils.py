@@ -347,8 +347,8 @@ def classification_performance(train_data, test_data):
             df_result.loc[train_flag,'Sample_size'] = len(train_data[train_flag]['label'])
             df_result.loc[train_flag,test_flag] = fit_classifier(train_data[train_flag]['text'],  train_data[train_flag]['label'],test_data[test_flag]['text'], test_data[test_flag]['label'], report=False)
         except: # no human annotated counterfactual training data for kindle  
-            df_result.loc[train_flag,'Sample_size'] = np.NaN
-            df_result.loc[train_flag,test_flag] = np.NaN
+            df_result.loc[train_flag,'Sample_size'] = np.nan
+            df_result.loc[train_flag,test_flag] = np.nan
     
     return df_result
 
