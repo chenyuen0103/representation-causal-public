@@ -194,7 +194,7 @@ dir(ds)
 
 if 'toxic' in moniker:
     train_data, test_data = train_test_split(ds, test_size=0.2, random_state=42)
-    train_data, test_data = train_data[:10].reset_index(drop=True), test_data[:10].reset_index(drop=True)
+    # train_data, test_data = train_data[:10].reset_index(drop=True), test_data[:10].reset_index(drop=True)
 else:
     train_data, test_data = organize_data(ds,limit='')
     df_result = classification_performance(train_data, test_data)
@@ -207,7 +207,7 @@ else:
     if 'tweets' in moniker:
         # Create a new column "label" with value 1 if "hostile" is 1 and -1 if "hostile" is 0
         train_data['label'] = train_data['hostile'].apply(lambda x: 1 if x == 1 else -1)
-    train_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(train_data[['text','label']][:10]))
+    train_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(train_data[['text','label']]))
 embed_all_sentences(train_data['all_original_sentences'])
 
 pickle.dump(train_data, open(data_out + 'ds_' + moniker + 'train' + '_w_emb.pkl','wb'))
@@ -220,7 +220,7 @@ else:
     if 'tweets' in moniker:
         # Create a new column "label" with value 1 if "hostile" is 1 and -1 if "hostile" is 0
         test_data['label'] = test_data['hostile'].apply(lambda x: 1 if x == 1 else -1)
-    test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data[['text','label']][:10]))
+    test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data[['text','label']]))
     # embed_all_sentences(get_all_sentences(pd.DataFrame(test_data[['text','label']][:10])))
 embed_all_sentences(test_data['all_original_sentences'])
 
