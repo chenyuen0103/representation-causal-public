@@ -186,7 +186,10 @@ ds_toxic_tweets = run_experiment(moniker='toxic_tweets',coef_thresh=1.0,data_pat
 
 moniker = args.dataset
 # moniker = 'toxic_comments'
-ds = load_data(moniker, data_path2)
+if 'toxic' in moniker:
+    ds = load_data(moniker, data_path2)
+else:
+    ds = load_data(moniker, data_out)
 dir(ds)
 
 if 'toxic' in moniker:
