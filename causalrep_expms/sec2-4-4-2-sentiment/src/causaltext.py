@@ -72,7 +72,7 @@ torch.manual_seed(randseed)
 
 parser = argparse.ArgumentParser(description='Run causal text')
 parser.add_argument('-d', '--dataset', type=str, default='kindle', choices=['imdb', 'imdb_sents', 'kindle'])
-parser.add_argument('--steps', type=int, default=2001)
+parser.add_argument('--steps', type=int, default=2)
 parser.add_argument('--hidden_dim', type=int, default=128)
 parser.add_argument('--l2_reg', type=float, default=1e-1)
 parser.add_argument('--lr', type=float, default=1e-2)
