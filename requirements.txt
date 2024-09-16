@@ -1,0 +1,20 @@
+#
+numpy
+pandas
+scipy
+scikit-learn
+nltk
+tqdm
+requests
+#torch
+#torchvision
+transformers
+
+# Additional dependencies
+importlib-metadata
+pickle-mixin
+argparse
+
+# Optional: This depends on your specific setup or if you're using utils and vae modules from external sources
+# These packages are not standard libraries and may need to be included manually.
+# Ensure the 'data_structure', 'utils', and 'vae' libraries are available.
