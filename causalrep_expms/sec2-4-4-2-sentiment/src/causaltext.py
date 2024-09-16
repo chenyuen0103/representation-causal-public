@@ -129,9 +129,10 @@ testobs_embedding_np = np.array([sentence.context_embedding for sentence in test
 testobs_label = torch.unsqueeze(torch.from_numpy((np.array([sentence.label for sentence in test_data['all_original_sentences']]) > 0)).float(), 1).cuda()
 
 
-testct_text = [sentence.context for sentence in test_data['all_counterfactual_sentences']]
-testct_embedding_np = np.array([sentence.context_embedding for sentence in test_data['all_counterfactual_sentences']])
-testct_label = torch.unsqueeze(torch.from_numpy((np.array([sentence.label for sentence in test_data['all_counterfactual_sentences']]) > 0)).float(), 1).cuda()
+if 'toxic' not in moniker:
+    testct_text = [sentence.context for sentence in test_data['all_counterfactual_sentences']]
+    testct_embedding_np = np.array([sentence.context_embedding for sentence in test_data['all_counterfactual_sentences']])
+    testct_label = torch.unsqueeze(torch.from_numpy((np.array([sentence.label for sentence in test_data['all_counterfactual_sentences']]) > 0)).float(), 1).cuda()
 
 
 train_embedding = torch.from_numpy(train_embedding_np).float().cuda()
