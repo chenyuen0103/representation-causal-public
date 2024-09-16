@@ -369,8 +369,10 @@ def initNet(layer):
 if 'toxic' not in moniker:
     envs = [
         {'text': X_train, 'bertz': train_embedding / torch.unsqueeze(torch.sqrt((train_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_train_cl_embedding, 'pcaz': train_pca_embedding, 'labels': train_label}, \
-        {'text': X_testct, 'bertz': testct_embedding / torch.unsqueeze(torch.sqrt((testct_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_testct_cl_embedding, 'pcaz': testct_pca_embedding, 'labels': testct_label}, \
-        {'text': X_testobs, 'bertz': testobs_embedding / torch.unsqueeze(torch.sqrt((testobs_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_testobs_cl_embedding, 'pcaz': testobs_pca_embedding, 'labels': testobs_label}]
+        {'text': X_testobs, 'bertz': testobs_embedding / torch.unsqueeze(torch.sqrt((testobs_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_testobs_cl_embedding, 'pcaz': testobs_pca_embedding, 'labels': testobs_label},\
+        {'text': X_testct,
+         'bertz': testct_embedding / torch.unsqueeze(torch.sqrt((testct_embedding ** 2).sum(axis=1)), 1),
+         'bertz_cl': X_testct_cl_embedding, 'pcaz': testct_pca_embedding, 'labels': testct_label}]
 else:
     envs = [
         {'text': X_train, 'bertz': train_embedding / torch.unsqueeze(torch.sqrt((train_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_train_cl_embedding, 'pcaz': train_pca_embedding, 'labels': train_label}, \
@@ -386,29 +388,29 @@ if flags.mode_train_data == 'text':
     flags.input_dim = vocabsize
     train_loader = torch.utils.data.DataLoader(dataset=envs[0]['text'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
     if 'toxic' not in moniker:
-        testct_loader = torch.utils.data.DataLoader(dataset=envs[1]['text'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
-    testobs_loader = torch.utils.data.DataLoader(dataset=envs[2]['text'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
+        testct_loader = torch.utils.data.DataLoader(dataset=envs[2]['text'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
+    testobs_loader = torch.utils.data.DataLoader(dataset=envs[1]['text'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
 elif flags.mode_train_data == 'bertz':
     flags.input_dim = train_embedding.shape[1]
     train_loader = torch.utils.data.DataLoader(dataset=envs[0]['bertz'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
     if 'toxic' not in moniker:
-        testct_loader = torch.utils.data.DataLoader(dataset=envs[1]['bertz'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
-    testobs_loader = torch.utils.data.DataLoader(dataset=envs[2]['bertz'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
+        testct_loader = torch.utils.data.DataLoader(dataset=envs[2]['bertz'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
+    testobs_loader = torch.utils.data.DataLoader(dataset=envs[1]['bertz'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
 
 
 if flags.mode_latent == 'vae':
     trainvaez_name = flags.dataset + 'k' + str(flags.z_dim) + 'trainvae.pt'
     if 'toxic' not in moniker:
         testctvaez_name = flags.dataset + 'k' + str(flags.z_dim) + 'testctvae.pt'
-        envs[1]['vaeimage'] = torch.load(pt_path + testctvaez_name)[0].detach()
-        envs[1]['vaez'] = torch.load(pt_path + testctvaez_name)[1].detach()
+        envs[2]['vaeimage'] = torch.load(pt_path + testctvaez_name)[0].detach()
+        envs[2]['vaez'] = torch.load(pt_path + testctvaez_name)[1].detach()
     testobsvaez_name = flags.dataset + 'k' + str(flags.z_dim) + 'testobsvae.pt'
     envs[0]['vaeimage'] = torch.load(pt_path+trainvaez_name)[0].detach()
 
-    envs[2]['vaeimage'] = torch.load(pt_path+testobsvaez_name)[0].detach()
+    envs[1]['vaeimage'] = torch.load(pt_path+testobsvaez_name)[0].detach()
 
     envs[0]['vaez'] = torch.load(pt_path+trainvaez_name)[1].detach()
-    envs[2]['vaez'] = torch.load(pt_path+testobsvaez_name)[1].detach()
+    envs[1]['vaez'] = torch.load(pt_path+testobsvaez_name)[1].detach()
 
 
 
@@ -465,10 +467,10 @@ for step in range(flags.steps):
     train_nll = torch.stack([envs[0]['nll']]).mean() 
     train_acc = torch.stack([envs[0]['acc']]).mean()
     if 'toxic' not in moniker:
-        testct_nll = torch.stack([envs[1]['nll']]).mean()
-        testct_acc = torch.stack([envs[1]['acc']]).mean()
-    testobs_nll = torch.stack([envs[2]['nll']]).mean()
-    testobs_acc = torch.stack([envs[2]['acc']]).mean()
+        testct_nll = torch.stack([envs[2]['nll']]).mean()
+        testct_acc = torch.stack([envs[2]['acc']]).mean()
+    testobs_nll = torch.stack([envs[1]['nll']]).mean()
+    testobs_acc = torch.stack([envs[1]['acc']]).mean()
 
     nll_loss = train_nll.clone() 
     # + train_l2penalty.clone()
@@ -494,8 +496,8 @@ for step in range(flags.steps):
 
         train_features, train_y = mlp(envs[0][flags.mode_train_data], envs[0][flags.mode_latent])[0].clone().cpu().detach().numpy(), envs[0]['labels'].clone().cpu().detach().numpy()
         if 'toxic' not in moniker:
-            testct_features, testct_y = mlp(envs[1][flags.mode_train_data], envs[1][flags.mode_latent])[0].clone().cpu().detach().numpy(), envs[1]['labels'].clone().cpu().detach().numpy()
-        testobs_features, testobs_y = mlp(envs[2][flags.mode_train_data], envs[2][flags.mode_latent])[0].clone().cpu().detach().numpy(), envs[2]['labels'].clone().cpu().detach().numpy()
+            testct_features, testct_y = mlp(envs[2][flags.mode_train_data], envs[2][flags.mode_latent])[0].clone().cpu().detach().numpy(), envs[2]['labels'].clone().cpu().detach().numpy()
+        testobs_features, testobs_y = mlp(envs[1][flags.mode_train_data], envs[1][flags.mode_latent])[0].clone().cpu().detach().numpy(), envs[1]['labels'].clone().cpu().detach().numpy()
 
         C_vals = [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5]
         causalrep_alphas, causalrep_trainaccs, causalrep_testobsaccs, causalrep_testctaccs = [], [], [], []
@@ -597,11 +599,11 @@ for C in [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5]:
     clf.fit(envs[0][flags.mode_train_data].cpu().detach().numpy(), train_y)
     resulttrain = classification_report((train_y > 0), (clf.predict(envs[0][flags.mode_train_data].cpu().detach().numpy()) > 0), output_dict=True)
 
-    resultobs = classification_report((testobs_y > 0), (clf.predict(envs[2][flags.mode_train_data].cpu().detach().numpy())> 0), output_dict=True)
+    resultobs = classification_report((testobs_y > 0), (clf.predict(envs[1][flags.mode_train_data].cpu().detach().numpy())> 0), output_dict=True)
     print('train',resulttrain['accuracy'])
     print('testobs',resultobs['accuracy'])
     if 'toxic' not in moniker:
-        resultct = classification_report((testct_y > 0), (clf.predict(envs[1][flags.mode_train_data].cpu().detach().numpy()) > 0), output_dict=True)
+        resultct = classification_report((testct_y > 0), (clf.predict(envs[2][flags.mode_train_data].cpu().detach().numpy()) > 0), output_dict=True)
         print('testct',resultct['accuracy'])
     sys.stdout.flush()
 
