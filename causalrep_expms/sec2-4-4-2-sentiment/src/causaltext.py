@@ -167,10 +167,10 @@ if 'toxic' not in moniker:
     testct_bert_cl_name = flags.dataset + 'testct_bert_cl.pt'
 
 
-torch.save(X_train_cl_embedding, train_bert_cl_name)
-torch.save(X_testobs_cl_embedding, testobs_bert_cl_name)
+torch.save(X_train_cl_embedding, pt_path+train_bert_cl_name)
+torch.save(X_testobs_cl_embedding, pt_path+testobs_bert_cl_name)
 if 'toxic' not in moniker:
-    torch.save(X_testct_cl_embedding, testct_bert_cl_name)
+    torch.save(X_testct_cl_embedding, pt_path+testct_bert_cl_name)
 
 
 X_train_cl_embedding = torch.load(pt_path+train_bert_cl_name).detach()
