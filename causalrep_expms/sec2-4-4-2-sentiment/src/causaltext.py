@@ -140,7 +140,8 @@ if 'toxic' not in moniker:
 
 train_embedding = torch.from_numpy(train_embedding_np).float().to(device)
 testobs_embedding = torch.from_numpy(testobs_embedding_np).float().to(device)
-testct_embedding = torch.from_numpy(testct_embedding_np).float().to(device)
+if 'toxic' not in moniker:
+    testct_embedding = torch.from_numpy(testct_embedding_np).float().to(device)
 
 # avoid recomputing the clustering
 
@@ -160,7 +161,8 @@ testct_embedding = torch.from_numpy(testct_embedding_np).float().to(device)
 
 train_bert_cl_name = flags.dataset + 'train_bert_cl.pt'
 testobs_bert_cl_name = flags.dataset + 'testobs_bert_cl.pt'
-testct_bert_cl_name = flags.dataset + 'testct_bert_cl.pt'
+if 'toxic' not in moniker:
+    testct_bert_cl_name = flags.dataset + 'testct_bert_cl.pt'
 
 
 # torch.save(X_train_cl_embedding, train_bert_cl_name)
@@ -170,7 +172,8 @@ testct_bert_cl_name = flags.dataset + 'testct_bert_cl.pt'
 
 X_train_cl_embedding = torch.load(pt_path+train_bert_cl_name).detach()
 X_testobs_cl_embedding = torch.load(pt_path+testobs_bert_cl_name).detach()
-X_testct_cl_embedding = torch.load(pt_path+testct_bert_cl_name).detach()
+if 'toxic' not in moniker:
+    X_testct_cl_embedding = torch.load(pt_path+testct_bert_cl_name).detach()
 
 
 # nonsing_clusters = torch.where(X_train_cl_embedding.sum(axis=0)>1)[0]
@@ -205,7 +208,8 @@ vec = TfidfVectorizer(min_df=5, binary=True, max_df=0.8, ngram_range=(1,3))
 X_full = vec.fit_transform(train_text)
 X_train_full = vec.transform(train_text)
 X_testobs_full = vec.transform(testobs_text)
-X_testct_full = vec.transform(testct_text)
+if 'toxic' not in moniker:
+    X_testct_full = vec.transform(testct_text)
 
 feats = np.array(vec.get_feature_names_out())
 
@@ -215,7 +219,8 @@ top_feature_idx, placebo_feature_idx, coef = get_top_terms(vec.transform(train_t
 
 X_train_np = vec.transform(train_text).toarray()
 X_testobs_np = vec.transform(testobs_text).toarray()
-X_testct_np = vec.transform(testct_text).toarray()
+if 'toxic' not in moniker:
+    X_testct_np = vec.transform(testct_text).toarray()
 
 
 
@@ -231,7 +236,8 @@ term2id = collections.OrderedDict({v:i for i,v in enumerate(feats[feature_idx])}
 
 X_train = torch.from_numpy(X_train_np[:,feature_idx]).float().to(device)
 X_testobs = torch.from_numpy(X_testobs_np[:,feature_idx]).float().to(device)
-X_testct = torch.from_numpy(X_testct_np[:,feature_idx]).float().to(device)
+if 'toxic' not in moniker:
+    X_testct = torch.from_numpy(X_testct_np[:,feature_idx]).float().to(device)
 
 vocabsize = X_train.shape[1]
 
@@ -245,7 +251,8 @@ pca.fit(np.row_stack([X_train_np[:,feature_idx]]))
 
 train_pca_embedding = torch.from_numpy(pca.transform(X_train_np[:,feature_idx])).float().to(device)
 testobs_pca_embedding = torch.from_numpy(pca.transform(X_testobs_np[:,feature_idx])).float().to(device)
-testct_pca_embedding = torch.from_numpy(pca.transform(X_testct_np[:,feature_idx])).float().to(device)
+if 'toxic' not in moniker:
+    testct_pca_embedding = torch.from_numpy(pca.transform(X_testct_np[:,feature_idx])).float().to(device)
 
 print(np.cumsum(pca.explained_variance_ratio_))
 
@@ -356,11 +363,15 @@ def initNet(layer):
     nn.init.xavier_uniform_(layer.weight)
     nn.init.zeros_(layer.bias)
 
-envs = [
-    {'text': X_train, 'bertz': train_embedding / torch.unsqueeze(torch.sqrt((train_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_train_cl_embedding, 'pcaz': train_pca_embedding, 'labels': train_label}, \
-    {'text': X_testct, 'bertz': testct_embedding / torch.unsqueeze(torch.sqrt((testct_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_testct_cl_embedding, 'pcaz': testct_pca_embedding, 'labels': testct_label}, \
-    {'text': X_testobs, 'bertz': testobs_embedding / torch.unsqueeze(torch.sqrt((testobs_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_testobs_cl_embedding, 'pcaz': testobs_pca_embedding, 'labels': testobs_label}]
-
+if 'toxic' not in moniker:
+    envs = [
+        {'text': X_train, 'bertz': train_embedding / torch.unsqueeze(torch.sqrt((train_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_train_cl_embedding, 'pcaz': train_pca_embedding, 'labels': train_label}, \
+        {'text': X_testct, 'bertz': testct_embedding / torch.unsqueeze(torch.sqrt((testct_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_testct_cl_embedding, 'pcaz': testct_pca_embedding, 'labels': testct_label}, \
+        {'text': X_testobs, 'bertz': testobs_embedding / torch.unsqueeze(torch.sqrt((testobs_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_testobs_cl_embedding, 'pcaz': testobs_pca_embedding, 'labels': testobs_label}]
+else:
+    envs = [
+        {'text': X_train, 'bertz': train_embedding / torch.unsqueeze(torch.sqrt((train_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_train_cl_embedding, 'pcaz': train_pca_embedding, 'labels': train_label}, \
+        {'text': X_testobs, 'bertz': testobs_embedding / torch.unsqueeze(torch.sqrt((testobs_embedding**2).sum(axis=1)), 1), 'bertz_cl': X_testobs_cl_embedding, 'pcaz': testobs_pca_embedding, 'labels': testobs_label}]
 
 if subset_nonsing == True:
     envs[0]['text'] = envs[0]['text'][nonsing_sents]
@@ -371,25 +382,29 @@ if subset_nonsing == True:
 if flags.mode_train_data == 'text':
     flags.input_dim = vocabsize
     train_loader = torch.utils.data.DataLoader(dataset=envs[0]['text'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
-    testct_loader = torch.utils.data.DataLoader(dataset=envs[1]['text'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
+    if 'toxic' not in moniker:
+        testct_loader = torch.utils.data.DataLoader(dataset=envs[1]['text'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
     testobs_loader = torch.utils.data.DataLoader(dataset=envs[2]['text'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
 elif flags.mode_train_data == 'bertz':
     flags.input_dim = train_embedding.shape[1]
     train_loader = torch.utils.data.DataLoader(dataset=envs[0]['bertz'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
-    testct_loader = torch.utils.data.DataLoader(dataset=envs[1]['bertz'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
+    if 'toxic' not in moniker:
+        testct_loader = torch.utils.data.DataLoader(dataset=envs[1]['bertz'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
     testobs_loader = torch.utils.data.DataLoader(dataset=envs[2]['bertz'].view(-1, flags.input_dim), batch_size=flags.batch_size, shuffle=False)
 
 
 if flags.mode_latent == 'vae':
     trainvaez_name = flags.dataset + 'k' + str(flags.z_dim) + 'trainvae.pt'
-    testctvaez_name = flags.dataset + 'k' + str(flags.z_dim) + 'testctvae.pt'
+    if 'toxic' not in moniker:
+        testctvaez_name = flags.dataset + 'k' + str(flags.z_dim) + 'testctvae.pt'
+        envs[1]['vaeimage'] = torch.load(pt_path + testctvaez_name)[0].detach()
+        envs[1]['vaez'] = torch.load(pt_path + testctvaez_name)[1].detach()
     testobsvaez_name = flags.dataset + 'k' + str(flags.z_dim) + 'testobsvae.pt'
     envs[0]['vaeimage'] = torch.load(pt_path+trainvaez_name)[0].detach()
-    envs[1]['vaeimage'] = torch.load(pt_path+testctvaez_name)[0].detach()
+
     envs[2]['vaeimage'] = torch.load(pt_path+testobsvaez_name)[0].detach()
 
     envs[0]['vaez'] = torch.load(pt_path+trainvaez_name)[1].detach()
-    envs[1]['vaez'] = torch.load(pt_path+testctvaez_name)[1].detach()
     envs[2]['vaez'] = torch.load(pt_path+testobsvaez_name)[1].detach()
 
 
@@ -446,8 +461,9 @@ for step in range(flags.steps):
     train_causalrep = torch.stack([envs[0]['causalrep']])
     train_nll = torch.stack([envs[0]['nll']]).mean() 
     train_acc = torch.stack([envs[0]['acc']]).mean()
-    testct_nll = torch.stack([envs[1]['nll']]).mean()
-    testct_acc = torch.stack([envs[1]['acc']]).mean()
+    if 'toxic' not in moniker:
+        testct_nll = torch.stack([envs[1]['nll']]).mean()
+        testct_acc = torch.stack([envs[1]['acc']]).mean()
     testobs_nll = torch.stack([envs[2]['nll']]).mean()
     testobs_acc = torch.stack([envs[2]['acc']]).mean()
 
@@ -474,7 +490,8 @@ for step in range(flags.steps):
         # print(mlp._main[0].weight)
 
         train_features, train_y = mlp(envs[0][flags.mode_train_data], envs[0][flags.mode_latent])[0].clone().cpu().detach().numpy(), envs[0]['labels'].clone().cpu().detach().numpy()
-        testct_features, testct_y = mlp(envs[1][flags.mode_train_data], envs[1][flags.mode_latent])[0].clone().cpu().detach().numpy(), envs[1]['labels'].clone().cpu().detach().numpy()
+        if 'toxic' not in moniker:
+            testct_features, testct_y = mlp(envs[1][flags.mode_train_data], envs[1][flags.mode_latent])[0].clone().cpu().detach().numpy(), envs[1]['labels'].clone().cpu().detach().numpy()
         testobs_features, testobs_y = mlp(envs[2][flags.mode_train_data], envs[2][flags.mode_latent])[0].clone().cpu().detach().numpy(), envs[2]['labels'].clone().cpu().detach().numpy()
 
         C_vals = [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5]
@@ -486,18 +503,23 @@ for step in range(flags.steps):
             clf = LogisticRegression(C=C, class_weight='balanced', solver='lbfgs')
             clf.fit(train_features, train_y)
             resulttrain = classification_report((train_y > 0), (clf.predict(train_features) > 0), output_dict=True)
-            resultct = classification_report((testct_y > 0), (clf.predict(testct_features) > 0), output_dict=True)
+
             resultobs = classification_report((testobs_y > 0), (clf.predict(testobs_features)> 0), output_dict=True)
             print('train',resulttrain['accuracy'])
             print('testobs',resultobs['accuracy'])
-            print('testct',resultct['accuracy'])
+            if 'toxic' not in moniker:
+                resultct = classification_report((testct_y > 0), (clf.predict(testct_features) > 0), output_dict=True)
+                print('testct',resultct['accuracy'])
+
+                causalrep_testctaccs.append(resultct['accuracy'])
             causalrep_trainaccs.append(resulttrain['accuracy'])
             causalrep_testobsaccs.append(resultobs['accuracy'])
-            causalrep_testctaccs.append(resultct['accuracy'])
+
             causalrep_alphas.append(alpha)
             if C == flags.regC:
                 final_train = resulttrain['accuracy']
-                final_testct = resultct['accuracy']
+                if 'toxic' not in moniker:
+                    final_testct = resultct['accuracy']
                 final_testobs = resultobs['accuracy']
             sys.stdout.flush()
 
@@ -520,7 +542,8 @@ for step in range(flags.steps):
 
     assert len(causalrep_alphas) == len(causalrep_trainaccs)
     assert len(causalrep_alphas) == len(causalrep_testobsaccs)
-    assert len(causalrep_alphas) == len(causalrep_testctaccs)
+    if 'toxic' not in moniker:
+        assert len(causalrep_alphas) == len(causalrep_testctaccs)
     for item in ['causalrep_trainaccs', 'causalrep_testobsaccs', 'causalrep_testctaccs']:
         for i, alpha in enumerate(causalrep_alphas):
             curname = item + '_' + str(alpha)
@@ -529,7 +552,10 @@ for step in range(flags.steps):
             elif item == 'causalrep_testobsaccs':
                 causalrep_res[curname] = causalrep_testobsaccs[i]
             elif item == 'causalrep_testctaccs':
-                causalrep_res[curname] = causalrep_testctaccs[i]
+                if 'toxic' not in moniker:
+                    causalrep_res[curname] = causalrep_testctaccs[i]
+                else:
+                    causalrep_res[curname] = 0
 
     res = pd.concat([pd.DataFrame(causalrep_res, index=[0]), res], axis=1)
 
@@ -539,7 +565,7 @@ for step in range(flags.steps):
         "train_causalrep", train_causalrep.detach().cpu().numpy(), 
         "train_nll", train_nll.detach().cpu().numpy(),
         "train_acc", train_acc.detach().cpu().numpy(),
-        "testct_acc", testct_acc.detach().cpu().numpy(),
+        "testct_acc", testct_acc.detach().cpu().numpy() if 'toxic' not in moniker else "",
         "testobs_acc", testobs_acc.detach().cpu().numpy())
         sys.stdout.flush()
 
@@ -549,7 +575,8 @@ res = pd.concat([pd.DataFrame(causalrep_res, index=[0]), res], axis=1)
 
 
 print("final train_acc", final_train)
-print("final testct_acc", final_testct)
+if 'toxic' not in moniker:
+    print("final testct_acc", final_testct)
 print("final testobs_acc", final_testobs)
 
 
@@ -566,11 +593,13 @@ for C in [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5]:
     clf = LogisticRegression(C=C, class_weight='balanced', solver='lbfgs')
     clf.fit(envs[0][flags.mode_train_data].cpu().detach().numpy(), train_y)
     resulttrain = classification_report((train_y > 0), (clf.predict(envs[0][flags.mode_train_data].cpu().detach().numpy()) > 0), output_dict=True)
-    resultct = classification_report((testct_y > 0), (clf.predict(envs[1][flags.mode_train_data].cpu().detach().numpy()) > 0), output_dict=True)
+
     resultobs = classification_report((testobs_y > 0), (clf.predict(envs[2][flags.mode_train_data].cpu().detach().numpy())> 0), output_dict=True)
     print('train',resulttrain['accuracy'])
     print('testobs',resultobs['accuracy'])
-    print('testct',resultct['accuracy'])
+    if 'toxic' not in moniker:
+        resultct = classification_report((testct_y > 0), (clf.predict(envs[1][flags.mode_train_data].cpu().detach().numpy()) > 0), output_dict=True)
+        print('testct',resultct['accuracy'])
     sys.stdout.flush()
 
     naive_weights = clf.coef_
@@ -580,7 +609,8 @@ for C in [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5]:
     print("top naive words", [id2term[i] for i in top_naive_words], top_coef)
     naive_trainaccs.append(resulttrain['accuracy'])
     naive_testobsaccs.append(resultobs['accuracy'])
-    naive_testctaccs.append(resultct['accuracy'])
+    if 'toxic' not in moniker:
+        naive_testctaccs.append(resultct['accuracy'])
     naive_alphas.append(alpha)
 
 
@@ -588,7 +618,8 @@ naive_res = {}
 
 assert len(naive_alphas) == len(naive_trainaccs)
 assert len(naive_alphas) == len(naive_testobsaccs)
-assert len(naive_alphas) == len(naive_testctaccs)
+if 'toxic' not in moniker:
+    assert len(naive_alphas) == len(naive_testctaccs)
 for item in ['naive_trainaccs', 'naive_testobsaccs', 'naive_testctaccs']:
     for i, alpha in enumerate(naive_alphas):
         curname = item + '_' + str(alpha)
@@ -597,7 +628,10 @@ for item in ['naive_trainaccs', 'naive_testobsaccs', 'naive_testctaccs']:
         elif item == 'naive_testobsaccs':
             naive_res[curname] = naive_testobsaccs[i]
         elif item == 'naive_testctaccs':
-            naive_res[curname] = naive_testctaccs[i]
+            if 'toxic' not in moniker:
+                naive_res[curname] = naive_testctaccs[i]
+            else:
+                naive_res[curname] = 0
 
 res = pd.concat([pd.DataFrame(naive_res, index=[0]), res], axis=1)
 
