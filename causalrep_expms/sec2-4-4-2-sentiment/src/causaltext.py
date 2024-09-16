@@ -205,7 +205,7 @@ X_train_full = vec.transform(train_text)
 X_testobs_full = vec.transform(testobs_text)
 X_testct_full = vec.transform(testct_text)
 
-feats = np.array(vec.get_feature_names())
+feats = np.array(vec.get_feature_names_out())
 
 top_feature_idx, placebo_feature_idx, coef = get_top_terms(vec.transform(train_text), train_label.cpu().numpy(), coef_thresh=0.0, placebo_thresh=0.1) # use coef_threshold=0.0 to take all features, no thresholding happening here.
 
