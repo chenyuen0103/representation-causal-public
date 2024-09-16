@@ -481,7 +481,7 @@ for step in range(flags.steps):
         for C in C_vals:
             alpha = 1./C
             print('\ncausal-pred-w-features', 'C', C)
-            clf = LogisticRegression(C=C, class_weight='auto', solver='lbfgs')
+            clf = LogisticRegression(C=C, class_weight='balanced', solver='lbfgs')
             clf.fit(train_features, train_y)
             resulttrain = classification_report((train_y > 0), (clf.predict(train_features) > 0), output_dict=True)
             resultct = classification_report((testct_y > 0), (clf.predict(testct_features) > 0), output_dict=True)
@@ -561,7 +561,7 @@ for C in [1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5]:
 
     # clf = LinearRegression()
     # clf = Ridge(alpha=alpha)
-    clf = LogisticRegression(C=C, class_weight='auto', solver='lbfgs')
+    clf = LogisticRegression(C=C, class_weight='balanced', solver='lbfgs')
     clf.fit(envs[0][flags.mode_train_data].cpu().detach().numpy(), train_y)
     resulttrain = classification_report((train_y > 0), (clf.predict(envs[0][flags.mode_train_data].cpu().detach().numpy()) > 0), output_dict=True)
     resultct = classification_report((testct_y > 0), (clf.predict(envs[1][flags.mode_train_data].cpu().detach().numpy()) > 0), output_dict=True)
