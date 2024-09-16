@@ -96,9 +96,11 @@ res['randseed'] = randseed
 print(flags)
 sys.stdout.flush()
 
-data_out = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/out/"
+# data_out = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/out/"
+data_out = "../out/"
 
 moniker = flags.dataset
+moniker = 'toxic_comments'
 
 out_dir = moniker + '_out'
 if not os.path.exists(out_dir):

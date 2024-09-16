@@ -191,6 +191,7 @@ dir(ds)
 
 if 'toxic' in moniker:
     train_data, test_data = train_test_split(ds, test_size=0.2, random_state=42)
+    train_data, test_data = train_data[:10].reset_index(drop=True), test_data[:10].reset_index(drop=True)
 else:
     train_data, test_data = organize_data(ds,limit='')
     df_result = classification_performance(train_data, test_data)
@@ -199,21 +200,21 @@ else:
 
 if 'toxic' not in moniker:
     train_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(train_data['original']))
-    embed_all_sentences(train_data['all_original_sentences'])
 else:
-    embed_all_sentences(get_all_sentences(pd.DataFrame(train_data[['text','label']][:10])))
+    train_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(train_data[['text','label']][:10]))
+embed_all_sentences(train_data['all_original_sentences'])
 
 pickle.dump(train_data, open(data_out + 'ds_' + moniker + 'train' + '_w_emb.pkl','wb'))
 
 if 'toxic' not in moniker:
-    test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data['original'])[:10])
-    breakpoint()
-    embed_all_sentences(test_data['all_original_sentences'])
-else:
-    embed_all_sentences(get_all_sentences(pd.DataFrame(test_data['text'])))
-
+    test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data['original']))
     test_data['all_counterfactual_sentences'] = get_all_sentences(pd.DataFrame(test_data['Counterfactual']))
     embed_all_sentences(test_data['all_counterfactual_sentences'])
+else:
+    test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data[['text','label']][:10]))
+    # embed_all_sentences(get_all_sentences(pd.DataFrame(test_data[['text','label']][:10])))
+embed_all_sentences(test_data['all_original_sentences'])
+
 
 pickle.dump(test_data, open(data_out + 'ds_' + moniker + 'test' + '_w_emb.pkl','wb'))
 
