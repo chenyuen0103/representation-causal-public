@@ -98,6 +98,7 @@ sys.stdout.flush()
 
 # data_out = "/proj/sml/usr/yixinwang/representation-causal/src/causalrep_expms/aaai-2021-counterfactuals-main/out/"
 data_out = "../out/"
+pt_path = "../dat/emb/"
 
 moniker = flags.dataset
 # moniker = 'toxic_comments'
@@ -165,9 +166,9 @@ testct_bert_cl_name = flags.dataset + 'testct_bert_cl.pt'
 # torch.save(X_testct_cl_embedding, testct_bert_cl_name)
 
 
-X_train_cl_embedding = torch.load(train_bert_cl_name).detach()
-X_testobs_cl_embedding = torch.load(testobs_bert_cl_name).detach()
-X_testct_cl_embedding = torch.load(testct_bert_cl_name).detach()
+X_train_cl_embedding = torch.load(pt_path+train_bert_cl_name).detach()
+X_testobs_cl_embedding = torch.load(pt_path+testobs_bert_cl_name).detach()
+X_testct_cl_embedding = torch.load(pt_path+testct_bert_cl_name).detach()
 
 
 # nonsing_clusters = torch.where(X_train_cl_embedding.sum(axis=0)>1)[0]
@@ -381,13 +382,13 @@ if flags.mode_latent == 'vae':
     trainvaez_name = flags.dataset + 'k' + str(flags.z_dim) + 'trainvae.pt'
     testctvaez_name = flags.dataset + 'k' + str(flags.z_dim) + 'testctvae.pt'
     testobsvaez_name = flags.dataset + 'k' + str(flags.z_dim) + 'testobsvae.pt'
-    envs[0]['vaeimage'] = torch.load(trainvaez_name)[0].detach()
-    envs[1]['vaeimage'] = torch.load(testctvaez_name)[0].detach()
-    envs[2]['vaeimage'] = torch.load(testobsvaez_name)[0].detach()
+    envs[0]['vaeimage'] = torch.load(pt_path+trainvaez_name)[0].detach()
+    envs[1]['vaeimage'] = torch.load(pt_path+testctvaez_name)[0].detach()
+    envs[2]['vaeimage'] = torch.load(pt_path+testobsvaez_name)[0].detach()
 
-    envs[0]['vaez'] = torch.load(trainvaez_name)[1].detach()
-    envs[1]['vaez'] = torch.load(testctvaez_name)[1].detach()
-    envs[2]['vaez'] = torch.load(testobsvaez_name)[1].detach()
+    envs[0]['vaez'] = torch.load(pt_path+trainvaez_name)[1].detach()
+    envs[1]['vaez'] = torch.load(pt_path+testctvaez_name)[1].detach()
+    envs[2]['vaez'] = torch.load(pt_path+testobsvaez_name)[1].detach()
 
 
 
