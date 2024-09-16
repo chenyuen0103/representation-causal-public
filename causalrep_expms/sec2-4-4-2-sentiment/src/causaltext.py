@@ -71,7 +71,7 @@ np.random.seed(randseed)
 torch.manual_seed(randseed)
 
 parser = argparse.ArgumentParser(description='Run causal text')
-parser.add_argument('-d', '--dataset', type=str, default='kindle', choices=['imdb', 'imdb_sents', 'kindle'])
+parser.add_argument('-d', '--dataset', type=str, default='kindle', choices=['imdb', 'imdb_sents', 'kindle','toxic_comments', 'toxic_tweets'])
 parser.add_argument('--steps', type=int, default=10)
 parser.add_argument('--hidden_dim', type=int, default=128)
 parser.add_argument('--l2_reg', type=float, default=1e-1)
@@ -91,6 +91,8 @@ flags, unk = parser.parse_known_args()
 
 res = pd.DataFrame(vars(flags), index=[0])
 res['randseed'] = randseed
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 print(flags)
@@ -122,23 +124,23 @@ test_data = pickle.load(open(data_out + 'ds_' + moniker + 'test' + '_w_emb.pkl',
 
 train_text = [sentence.context for sentence in train_data['all_original_sentences']]
 train_embedding_np = np.array([sentence.context_embedding for sentence in train_data['all_original_sentences']])
-train_label = torch.unsqueeze(torch.from_numpy((np.array([sentence.label for sentence in train_data['all_original_sentences']]) > 0)).float(), 1).cuda()
+train_label = torch.unsqueeze(torch.from_numpy((np.array([sentence.label for sentence in train_data['all_original_sentences']]) > 0)).float(), 1).to(device)
 
 
 testobs_text = [sentence.context for sentence in test_data['all_original_sentences']]
 testobs_embedding_np = np.array([sentence.context_embedding for sentence in test_data['all_original_sentences']])
-testobs_label = torch.unsqueeze(torch.from_numpy((np.array([sentence.label for sentence in test_data['all_original_sentences']]) > 0)).float(), 1).cuda()
+testobs_label = torch.unsqueeze(torch.from_numpy((np.array([sentence.label for sentence in test_data['all_original_sentences']]) > 0)).float(), 1).to(device)
 
 
 if 'toxic' not in moniker:
     testct_text = [sentence.context for sentence in test_data['all_counterfactual_sentences']]
     testct_embedding_np = np.array([sentence.context_embedding for sentence in test_data['all_counterfactual_sentences']])
-    testct_label = torch.unsqueeze(torch.from_numpy((np.array([sentence.label for sentence in test_data['all_counterfactual_sentences']]) > 0)).float(), 1).cuda()
+    testct_label = torch.unsqueeze(torch.from_numpy((np.array([sentence.label for sentence in test_data['all_counterfactual_sentences']]) > 0)).float(), 1).to(device)
 
 
-train_embedding = torch.from_numpy(train_embedding_np).float().cuda()
-testobs_embedding = torch.from_numpy(testobs_embedding_np).float().cuda()
-testct_embedding = torch.from_numpy(testct_embedding_np).float().cuda()
+train_embedding = torch.from_numpy(train_embedding_np).float().to(device)
+testobs_embedding = torch.from_numpy(testobs_embedding_np).float().to(device)
+testct_embedding = torch.from_numpy(testct_embedding_np).float().to(device)
 
 # avoid recomputing the clustering
 
@@ -150,9 +152,9 @@ testct_embedding = torch.from_numpy(testct_embedding_np).float().cuda()
 
 # dummy = np.eye(clustering.labels_.max()+1)
 
-# X_train_cl_embedding = torch.from_numpy(dummy[X_train_cl]).float().cuda()
-# X_testobs_cl_embedding = torch.from_numpy(dummy[X_testobs_cl]).float().cuda()
-# X_testct_cl_embedding = torch.from_numpy(dummy[X_testct_cl]).float().cuda()
+# X_train_cl_embedding = torch.from_numpy(dummy[X_train_cl]).float().to(device)
+# X_testobs_cl_embedding = torch.from_numpy(dummy[X_testobs_cl]).float().to(device)
+# X_testct_cl_embedding = torch.from_numpy(dummy[X_testct_cl]).float().to(device)
 
 
 
@@ -227,9 +229,9 @@ id2term = collections.OrderedDict({i:v for i,v in enumerate(feats[feature_idx])}
 term2id = collections.OrderedDict({v:i for i,v in enumerate(feats[feature_idx])})
 
 
-X_train = torch.from_numpy(X_train_np[:,feature_idx]).float().cuda()
-X_testobs = torch.from_numpy(X_testobs_np[:,feature_idx]).float().cuda()
-X_testct = torch.from_numpy(X_testct_np[:,feature_idx]).float().cuda()
+X_train = torch.from_numpy(X_train_np[:,feature_idx]).float().to(device)
+X_testobs = torch.from_numpy(X_testobs_np[:,feature_idx]).float().to(device)
+X_testct = torch.from_numpy(X_testct_np[:,feature_idx]).float().to(device)
 
 vocabsize = X_train.shape[1]
 
@@ -241,9 +243,9 @@ pca = PCA(n_components=flags.z_dim)
 
 pca.fit(np.row_stack([X_train_np[:,feature_idx]]))
 
-train_pca_embedding = torch.from_numpy(pca.transform(X_train_np[:,feature_idx])).float().cuda()
-testobs_pca_embedding = torch.from_numpy(pca.transform(X_testobs_np[:,feature_idx])).float().cuda()
-testct_pca_embedding = torch.from_numpy(pca.transform(X_testct_np[:,feature_idx])).float().cuda()
+train_pca_embedding = torch.from_numpy(pca.transform(X_train_np[:,feature_idx])).float().to(device)
+testobs_pca_embedding = torch.from_numpy(pca.transform(X_testobs_np[:,feature_idx])).float().to(device)
+testct_pca_embedding = torch.from_numpy(pca.transform(X_testct_np[:,feature_idx])).float().to(device)
 
 print(np.cumsum(pca.explained_variance_ratio_))
 
@@ -263,9 +265,9 @@ print(pca.explained_variance_ratio_ * flags.input_dim)
 
 # pca.fit(np.row_stack([X_train_np[:,feature_idx]]))
 
-# train_pca_embedding = torch.from_numpy(pca.transform(X_train_np[:,feature_idx])).float().cuda()
-# testobs_pca_embedding = torch.from_numpy(pca.transform(X_testobs_np[:,feature_idx])).float().cuda()
-# testct_pca_embedding = torch.from_numpy(pca.transform(X_testct_np[:,feature_idx])).float().cuda()
+# train_pca_embedding = torch.from_numpy(pca.transform(X_train_np[:,feature_idx])).float().to(device)
+# testobs_pca_embedding = torch.from_numpy(pca.transform(X_testobs_np[:,feature_idx])).float().to(device)
+# testct_pca_embedding = torch.from_numpy(pca.transform(X_testct_np[:,feature_idx])).float().to(device)
 
 
 
@@ -392,7 +394,7 @@ if flags.mode_latent == 'vae':
 
 
 
-mlp = MLP().cuda()
+mlp = MLP().to(device)
 optimizer_causalrep = optim.Adam(mlp._main.parameters(), lr=10*flags.lr)
 
 for step in range(flags.steps):
@@ -408,11 +410,11 @@ for step in range(flags.steps):
         y = labels - labels.mean()
         X = torch.cat([features, env[flags.mode_latent]], dim=1)
         X = X - X.mean(dim=0)
-        X = torch.cat([torch.ones(X.shape[0],1).cuda(), X], dim=1)
+        X = torch.cat([torch.ones(X.shape[0],1).to(device), X], dim=1)
 
         beta = [torch.matmul(
             torch.matmul(
-                torch.inverse(flags.l2_reg*torch.eye(X.shape[1]).cuda()+
+                torch.inverse(flags.l2_reg*torch.eye(X.shape[1]).to(device)+
                     torch.matmul(
                         torch.transpose(X, 0, 1),
                         X)),
@@ -427,7 +429,7 @@ for step in range(flags.steps):
 
 
 
-        weight_norm = torch.tensor(0.).cuda()
+        weight_norm = torch.tensor(0.).to(device)
         for w in mlp.finallayer.parameters():
             weight_norm += w.norm().pow(2)
 
