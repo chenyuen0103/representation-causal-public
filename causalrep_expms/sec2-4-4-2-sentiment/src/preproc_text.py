@@ -207,14 +207,13 @@ else:
     if 'tweets' in moniker:
         # Create a new column "label" with value 1 if "hostile" is 1 and -1 if "hostile" is 0
         train_data['label'] = train_data['hostile'].apply(lambda x: 1 if x == 1 else -1)
-
     train_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(train_data[['text','label']][:10]))
 embed_all_sentences(train_data['all_original_sentences'])
 
 pickle.dump(train_data, open(data_out + 'ds_' + moniker + 'train' + '_w_emb.pkl','wb'))
 
 if 'toxic' not in moniker:
-    test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data['original']))
+    test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data['Original']))
     test_data['all_counterfactual_sentences'] = get_all_sentences(pd.DataFrame(test_data['Counterfactual']))
     embed_all_sentences(test_data['all_counterfactual_sentences'])
 else:
@@ -224,6 +223,7 @@ else:
     test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data[['text','label']][:10]))
     # embed_all_sentences(get_all_sentences(pd.DataFrame(test_data[['text','label']][:10])))
 embed_all_sentences(test_data['all_original_sentences'])
+
 
 
 pickle.dump(test_data, open(data_out + 'ds_' + moniker + 'test' + '_w_emb.pkl','wb'))
