@@ -185,7 +185,7 @@ print('Feature matrix: %s' % str(X.shape))
 
 
 moniker = args.dataset
-moniker = 'toxic_tweets'
+# moniker = 'toxic_tweets'
 if 'toxic' in moniker:
     ds = load_data(moniker, data_path2)
 else:
