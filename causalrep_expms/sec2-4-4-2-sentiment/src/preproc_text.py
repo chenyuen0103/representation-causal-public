@@ -174,14 +174,14 @@ print('Feature matrix: %s' % str(X.shape))
 # df_test_select = select_sents(df_test, data_path2)
 # print(df_test_select.head())
 
-ds_imdb = run_experiment(moniker='imdb',coef_thresh=0.4,data_path=data_path2, data_out=data_out)
-ds_imdb_sents = run_experiment(moniker='imdb_sents',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
+# ds_imdb = run_experiment(moniker='imdb',coef_thresh=0.4,data_path=data_path2, data_out=data_out)
+# ds_imdb_sents = run_experiment(moniker='imdb_sents',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
+# #
+# ds_kindle = run_experiment(moniker='kindle',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
 #
-ds_kindle = run_experiment(moniker='kindle',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
-
-
-ds_toxic_cmts = run_experiment(moniker='toxic_comments',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
-ds_toxic_tweets = run_experiment(moniker='toxic_tweets',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
+#
+# ds_toxic_cmts = run_experiment(moniker='toxic_comments',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
+# ds_toxic_tweets = run_experiment(moniker='toxic_tweets',coef_thresh=1.0,data_path=data_path2, data_out=data_out)
 
 
 moniker = args.dataset
