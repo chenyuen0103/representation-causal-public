@@ -4,7 +4,7 @@
 TIMESTAMP=$(date +%Y%m%d%H%M%S%N)
 
 PYCODE_SWEEP="preproc_text"
-DATASET_SWEEP="imdb imdb_sents kindle toxic_comments toxic_tweets"
+DATASET_SWEEP="toxic_comments toxic_tweets"
 #DATASET_SWEEP="toxic_comments toxic_tweets"
 AGGRESSIVE_SWEEP="0"
 TASKID_SWEEP="3"

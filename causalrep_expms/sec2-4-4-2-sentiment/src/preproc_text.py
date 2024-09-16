@@ -185,7 +185,7 @@ print('Feature matrix: %s' % str(X.shape))
 
 
 moniker = args.dataset
-# moniker = 'toxic_comments'
+moniker = 'toxic_tweets'
 if 'toxic' in moniker:
     ds = load_data(moniker, data_path2)
 else:
@@ -204,6 +204,10 @@ else:
 if 'toxic' not in moniker:
     train_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(train_data['original']))
 else:
+    if 'tweets' in moniker:
+        # Create a new column "label" with value 1 if "hostile" is 1 and -1 if "hostile" is 0
+        train_data['label'] = train_data['hostile'].apply(lambda x: 1 if x == 1 else -1)
+
     train_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(train_data[['text','label']][:10]))
 embed_all_sentences(train_data['all_original_sentences'])
 
@@ -214,6 +218,9 @@ if 'toxic' not in moniker:
     test_data['all_counterfactual_sentences'] = get_all_sentences(pd.DataFrame(test_data['Counterfactual']))
     embed_all_sentences(test_data['all_counterfactual_sentences'])
 else:
+    if 'tweets' in moniker:
+        # Create a new column "label" with value 1 if "hostile" is 1 and -1 if "hostile" is 0
+        test_data['label'] = test_data['hostile'].apply(lambda x: 1 if x == 1 else -1)
     test_data['all_original_sentences'] = get_all_sentences(pd.DataFrame(test_data[['text','label']][:10]))
     # embed_all_sentences(get_all_sentences(pd.DataFrame(test_data[['text','label']][:10])))
 embed_all_sentences(test_data['all_original_sentences'])
