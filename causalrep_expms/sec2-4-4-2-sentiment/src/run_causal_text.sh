@@ -45,8 +45,15 @@ for i in {1..3}; do
                                     export FILENAME=${PYCODE_SWEEPi}${CODE_SUFFIX}
                                     export OUTNAME=${PYCODE_SWEEPi}_data${DATASETi}_HDIM${HDIMi}_MODE${MODEi}_lr${LRi}_L2REG${L2REGi}_ZDIM${ZDIMi}_NUMFEA${NUMFEAi}_${TIMESTAMP}${OUT_SUFFIX}
                                     export PRTOUT=${PYCODE_SWEEPi}_data${DATASETi}_HDIM${HDIMi}_MODE${MODEi}_lr${LRi}_L2REG${L2REGi}_ZDIM${ZDIMi}_NUMFEA${NUMFEAi}_${TIMESTAMP}${PRT_SUFFIX}
-                                    echo ${NAME}
-                                    bash ${RUN_SCRIPT} > ${OUTNAME} 2>&1
+
+                                    # Check if the output file already exists
+                                    EXISTING_FILE=${PYCODE_SWEEPi}_data${DATASETi}_HDIM${HDIMi}_MODE${MODEi}_lr${LRi}_L2REG${L2REGi}_ZDIM${ZDIMi}_NUMFEA${NUMFEAi}_*.out
+                                    if ls ${EXISTING_FILE} 1> /dev/null 2>&1; then
+                                        echo "Skipping ${OUTNAME} as it already exists."
+                                    else
+                                        echo ${NAME}
+#                                        bash ${RUN_SCRIPT} > ${OUTNAME} 2>&1
+                                    fi
                                 done
                             done
                         done
