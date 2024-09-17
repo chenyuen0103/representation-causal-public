@@ -52,7 +52,7 @@ for i in {1..3}; do
                                         echo "Skipping ${OUTNAME} as it already exists."
                                     else
                                         echo ${NAME}
-#                                        bash ${RUN_SCRIPT} > ${OUTNAME} 2>&1
+                                        bash ${RUN_SCRIPT} > ${OUTNAME} 2>&1
                                     fi
                                 done
                             done
