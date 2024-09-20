@@ -140,6 +140,7 @@ if 'toxic' not in moniker:
 
 train_embedding = torch.from_numpy(train_embedding_np).float().to(device)
 testobs_embedding = torch.from_numpy(testobs_embedding_np).float().to(device)
+breakpoint()
 if 'toxic' not in moniker:
     testct_embedding = torch.from_numpy(testct_embedding_np).float().to(device)
 
@@ -639,6 +640,7 @@ for item in ['naive_trainaccs', 'naive_testobsaccs', 'naive_testctaccs']:
                 naive_res[curname] = 0
 
 res = pd.concat([pd.DataFrame(naive_res, index=[0]), res], axis=1)
+
 
 
 res.to_csv(out_dir + '/' + moniker + '_text' + str(int(time.time()*1e6)) + '.csv')
