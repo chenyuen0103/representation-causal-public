@@ -140,7 +140,7 @@ if 'toxic' not in moniker:
 
 train_embedding = torch.from_numpy(train_embedding_np).float().to(device)
 testobs_embedding = torch.from_numpy(testobs_embedding_np).float().to(device)
-breakpoint()
+
 if 'toxic' not in moniker:
     testct_embedding = torch.from_numpy(testct_embedding_np).float().to(device)
 
@@ -174,7 +174,7 @@ if 'toxic' not in moniker:
 #     torch.save(X_testct_cl_embedding, pt_path+testct_bert_cl_name)
 
 
-X_train_cl_embedding = torch.load(pt_path+train_bert_cl_name).detach()
+X_train_cl_embedding = torch.load(pt_path+train_bert_cl_name).detach() # representation from Agglomerative Clustering
 X_testobs_cl_embedding = torch.load(pt_path+testobs_bert_cl_name).detach()
 if 'toxic' not in moniker:
     X_testct_cl_embedding = torch.load(pt_path+testct_bert_cl_name).detach()
@@ -195,6 +195,7 @@ if 'toxic' not in moniker:
 
 
 # vec = CountVectorizer(min_df=5, binary=True, max_df=0.8)
+
 # X_full = vec.fit_transform(list(train_text) + list(testobs_text) + list(testct_text))
 # X_train_full = vec.transform(train_text)
 # X_testobs_full = vec.transform(testobs_text)
@@ -204,8 +205,9 @@ stop_words = set(stopwords.words('english'))
 
 
 # vec = CountVectorizer(min_df=5, binary=True, max_df=0.8, ngram_range=(1,3))
-
 vec = TfidfVectorizer(min_df=5, binary=True, max_df=0.8, ngram_range=(1,3))
+
+
 
 # stop_words=stop_words, 
 # X_full = vec.fit_transform(list(train_text[i.cpu().numpy()] for i in nonsing_sents))
@@ -225,7 +227,7 @@ X_train_np = vec.transform(train_text).toarray()
 X_testobs_np = vec.transform(testobs_text).toarray()
 if 'toxic' not in moniker:
     X_testct_np = vec.transform(testct_text).toarray()
-
+breakpoint()
 
 
 fea_corrcoef = np.corrcoef(X_train_np[:,top_feature_idx].T) - np.eye(X_train_np[:,top_feature_idx].shape[1])
