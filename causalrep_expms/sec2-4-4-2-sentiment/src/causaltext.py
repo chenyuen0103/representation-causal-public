@@ -547,13 +547,13 @@ for step in range(flags.steps):
     top_causal_weights = feature_weights[0].detach().cpu().numpy()
     for j in np.argsort(-np.abs(beta[0][1:(1+flags.num_features)].detach().cpu().numpy())):
     # for j in range(top_causal_words.shape[0]):
-        print("feature", j)
-        print("coefficient", beta[0][j+1])
-        sort_causal_words = np.argsort(-top_causal_weights[j])[:20]
-
-        print("top causal words", [id2term[i] for i in top_causal_words[j][sort_causal_words]], top_causal_weights[j][sort_causal_words]
-        )
-        
+    #     print("feature", j)
+    #     print("coefficient", beta[0][j+1])
+    #     sort_causal_words = np.argsort(-top_causal_weights[j])[:20]
+    #
+    #     print("top causal words", [id2term[i] for i in top_causal_words[j][sort_causal_words]], top_causal_weights[j][sort_causal_words]
+    #     )
+    #
     causalrep_res = {}
 
     assert len(causalrep_alphas) == len(causalrep_trainaccs)
