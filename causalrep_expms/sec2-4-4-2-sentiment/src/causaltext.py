@@ -88,6 +88,14 @@ parser.add_argument('--mode_train_data', type=str, default="text", choices=["tex
 flags, unk = parser.parse_known_args()
 
 # chose num_features
+feature_dir = "../features/"
+
+if not os.path.exists(feature_dir):
+    os.makedirs(feature_dir)
+
+# get file name from flags
+filename = flags.dataset + '_lr' + str(flags.lr) + '_l2reg' + str(flags.l2_reg) + '_zdim' + str(flags.z_dim) + '_numfea' + str(flags.num_features) + f'_{flags.mode}' + '_' + flags.mode_latent + '_steps' + str(flags.steps) + '_rand' + str(randseed) + '.pkl'
+
 
 res = pd.DataFrame(vars(flags), index=[0])
 res['randseed'] = randseed
@@ -424,7 +432,6 @@ for step in range(flags.steps):
     for i in range(len(envs)):
         env = envs[i]
         features, logits, probs, beta_hat, logit_hats, prob_hats = mlp(env[flags.mode_train_data], env[flags.mode_latent])
-        breakpoint()
         labels = env['labels']
         env['nll'] = mean_nll(probs, env['labels'], mode=flags.mode) 
         env['nllhat'] = mean_nll(prob_hats, env['labels'], mode=flags.mode) 
@@ -643,6 +650,13 @@ for item in ['naive_trainaccs', 'naive_testobsaccs', 'naive_testctaccs']:
                 naive_res[curname] = 0
 
 res = pd.concat([pd.DataFrame(naive_res, index=[0]), res], axis=1)
+
+# save envs into a file
+with open(feature_dir+filename, 'wb') as f:
+    pickle.dump(envs, f)
+    # close the file
+
+
 
 
 
