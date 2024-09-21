@@ -227,7 +227,6 @@ X_train_np = vec.transform(train_text).toarray()
 X_testobs_np = vec.transform(testobs_text).toarray()
 if 'toxic' not in moniker:
     X_testct_np = vec.transform(testct_text).toarray()
-breakpoint()
 
 
 fea_corrcoef = np.corrcoef(X_train_np[:,top_feature_idx].T) - np.eye(X_train_np[:,top_feature_idx].shape[1])
@@ -259,6 +258,7 @@ train_pca_embedding = torch.from_numpy(pca.transform(X_train_np[:,feature_idx]))
 testobs_pca_embedding = torch.from_numpy(pca.transform(X_testobs_np[:,feature_idx])).float().to(device)
 if 'toxic' not in moniker:
     testct_pca_embedding = torch.from_numpy(pca.transform(X_testct_np[:,feature_idx])).float().to(device)
+
 
 print(np.cumsum(pca.explained_variance_ratio_))
 
@@ -424,6 +424,7 @@ for step in range(flags.steps):
     for i in range(len(envs)):
         env = envs[i]
         features, logits, probs, beta_hat, logit_hats, prob_hats = mlp(env[flags.mode_train_data], env[flags.mode_latent])
+        breakpoint()
         labels = env['labels']
         env['nll'] = mean_nll(probs, env['labels'], mode=flags.mode) 
         env['nllhat'] = mean_nll(prob_hats, env['labels'], mode=flags.mode) 
