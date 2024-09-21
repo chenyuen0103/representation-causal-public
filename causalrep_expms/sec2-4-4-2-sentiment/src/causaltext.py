@@ -541,7 +541,7 @@ for step in range(flags.steps):
 
 
 
-    print("\n\n##### causal rep top words")
+    # print("\n\n##### causal rep top words")
     feature_weights = torch.topk(F.softmax(mlp._main[0].weight,dim=1),20, axis=1)
     top_causal_words = feature_weights[1].detach().cpu().numpy()
     top_causal_weights = feature_weights[0].detach().cpu().numpy()
